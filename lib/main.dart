@@ -1,54 +1,26 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, use_key_in_widget_constructors
-
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'View/Routes/app_routes.dart';
+import 'View/Themes/app_theme.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-import 'package:logitrust_drivers/splashScreen/splash_screen.dart';
+import 'firebase_options.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
-  runApp(
-    MyApp(
-      child: MaterialApp(
-        title: 'LogiTrust',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: MySplashScreen(),
-        debugShowCheckedModeBanner: false,
-      ),
-    ),
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatefulWidget {
-  final Widget? child;
-
-  MyApp({this.child});
-
-  static void restartApp(BuildContext context) {
-    context.findAncestorStateOfType<_MyAppState>()!.restartApp();
-  }
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Key key = UniqueKey();
-  void restartApp() {
-    setState(() {
-      key = UniqueKey();
-    });
-  }
-
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: key,
-      child: widget.child!,
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'Trippo',
+      theme: appTheme,
+      routerConfig: router,
     );
   }
 }

@@ -44,7 +44,7 @@ class SplashLogics {
         } else {
           if (context.mounted) {
             ErrorNotification().showError(
-                context, "Location Access is required to run Trippo.");
+                context, "Location Access is required to run LogiTrust.");
           }
 
           await Future.delayed(const Duration(seconds: 2));
@@ -61,8 +61,8 @@ class SplashLogics {
       if (permission == LocationPermission.deniedForever ||
           permission == LocationPermission.unableToDetermine) {
         if (context.mounted) {
-          ErrorNotification()
-              .showError(context, "Location Access is required to run Trippo.");
+          ErrorNotification().showError(
+              context, "Location Access is required to run LogiTrust.");
           await Future.delayed(const Duration(seconds: 2));
           SystemChannels.platform
               .invokeMethod("SystemNavigator.exitApplication");

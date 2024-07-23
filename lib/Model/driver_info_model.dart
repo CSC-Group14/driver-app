@@ -2,9 +2,10 @@ class DriverInfoModel {
   String id;
   String name;
   String email;
-  String carName;
-  String carPlateNum;
-  String carType;
+  String truckName;
+  String truckPlateNum;
+  String truckType;
 
-  DriverInfoModel(this.id,this.name,this.email, this.carName, this.carPlateNum, this.carType);
+  DriverInfoModel(this.id, this.name, this.email, this.truckName,
+      this.truckPlateNum, this.truckType);
 }

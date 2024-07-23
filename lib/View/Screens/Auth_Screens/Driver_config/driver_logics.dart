@@ -9,16 +9,19 @@ import 'package:logitrust_drivers/View/Screens/Auth_Screens/Driver_config/driver
 
 class DriverLogics {
   void sendDataToFirestore(
-      BuildContext context,
-      ref,
-      TextEditingController truckNameController,
-      TextEditingController plateNumController,
-      File? frontImageFile,
-      File? backImageFile) async {
+    BuildContext context,
+    ref,
+    TextEditingController truckNameController,
+    TextEditingController truckPlateNumController,
+    String licenceExpiryDate,
+    File? frontImageFile,
+    File? backImageFile,
+  ) async {
     try {
-      if (truckNameController.text.isEmpty || plateNumController.text.isEmpty) {
-        ErrorNotification()
-            .showError(context, "Please Enter Car Name and Plate Number");
+      if (truckNameController.text.isEmpty ||
+          truckPlateNumController.text.isEmpty) {
+        ErrorNotification().showError(
+            context, "Please Enter Truck Name and Truck Plate Number");
 
         return;
       }
@@ -27,7 +30,7 @@ class DriverLogics {
       ref.watch(globalFirestoreRepoProvider).addDriversDataToFirestore(
           context,
           truckNameController.text.trim(),
-          plateNumController.text.trim(),
+          truckPlateNumController.text.trim(),
           ref.watch(driverConfigDropDownProvider)!);
 
       if (context.mounted) {

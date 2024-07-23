@@ -21,44 +21,140 @@ class _NavigationScreenState extends State<NavigationScreen> {
     const ProfileScreen()
   ];
 
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Logout"),
+          content: Text("Are you sure you want to logout?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Logout"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _logout();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _logout() {
+    // Implement your logout functionality here
+    // For example, you might clear user session data and navigate to the login screen
+    // Navigator.pushReplacementNamed(context, '/login');
+    print("User logged out");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, child) {
         return Scaffold(
-          body: screens[ref.watch(navigationStateProvider)],
-          bottomNavigationBar: NavigationBar(
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                label: "",
-                selectedIcon: Icon(Icons.home),
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.currency_bitcoin_outlined),
-                label: "",
-                selectedIcon: Icon(Icons.currency_bitcoin),
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.history_edu_outlined),
-                label: "",
-                selectedIcon: Icon(Icons.history_edu),
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person_2_outlined),
-                label: "",
-                selectedIcon: Icon(Icons.person),
-              )
-            ],
-            onDestinationSelected: (int selection) {
-              ref
-                  .watch(navigationStateProvider.notifier)
-                  .update((state) => selection);
-            },
-            backgroundColor: Colors.black38,
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-            selectedIndex: ref.watch(navigationStateProvider),
+          drawer: Drawer(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                UserAccountsDrawerHeader(
+                  accountName: Text("Rlexandra"),
+                  accountEmail: Text("rlexandra@gmail.com"),
+                  currentAccountPicture: CircleAvatar(
+                    child: ClipOval(
+                      child: Image.network(
+                        'https://via.placeholder.com/150',
+                        fit: BoxFit.cover,
+                        width: 90,
+                        height: 90,
+                      ),
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.home_outlined, color: Colors.blueAccent),
+                  title: Text('Home'),
+                  onTap: () {
+                    ref
+                        .watch(navigationStateProvider.notifier)
+                        .update((state) => 0);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.payment, color: Colors.blueAccent),
+                  title: Text('Payments'),
+                  onTap: () {
+                    ref
+                        .watch(navigationStateProvider.notifier)
+                        .update((state) => 1);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.history, color: Colors.blueAccent),
+                  title: Text('History'),
+                  onTap: () {
+                    ref
+                        .watch(navigationStateProvider.notifier)
+                        .update((state) => 2);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading:
+                      Icon(Icons.person_2_outlined, color: Colors.blueAccent),
+                  title: Text('Profile'),
+                  onTap: () {
+                    ref
+                        .watch(navigationStateProvider.notifier)
+                        .update((state) => 3);
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.settings, color: Colors.blueAccent),
+                  title: Text(
+                    'Settings',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  onTap: () {
+                    // Navigate to settings page
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.help, color: Colors.blueAccent),
+                  title: Text(
+                    'Support',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  onTap: () {
+                    // Navigate to support page
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.exit_to_app, color: Colors.blueAccent),
+                  title: Text('Log Out'),
+                  onTap: () {
+                    Navigator.pop(context); // Close the drawer
+                    _showLogoutDialog(
+                        context); // Show the logout confirmation dialog
+                  },
+                ),
+              ],
+            ),
           ),
+          body: screens[ref.watch(navigationStateProvider)],
         );
       },
     );

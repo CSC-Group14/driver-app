@@ -98,7 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   color: Colors.blue),
                               child: !ref
                                       .watch(homeScreenIsDriverActiveProvider)
-                                  ? const Text("You are Offline")
+                                  ? const Text("Tap to go online")
                                   : const Icon(Icons.phonelink_ring_outlined,
                                       color: Colors.white, size: 20),
                             ),

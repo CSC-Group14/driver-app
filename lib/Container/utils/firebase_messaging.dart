@@ -41,7 +41,7 @@ class MessagingService {
 
       const AndroidNotificationChannel channel = AndroidNotificationChannel(
         'high_importance_channel', // id
-        'Trippo (Driver)', // title // description
+        'LogiTrust (Driver)', // title // description
         importance: Importance.max,
       );
 

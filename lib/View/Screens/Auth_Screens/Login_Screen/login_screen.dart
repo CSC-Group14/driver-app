@@ -110,8 +110,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       .bodyLarge!
                                       .copyWith(
                                           fontFamily: "bold",
-                                          fontSize: 12,
-                                          color: Colors.blue),
+                                          fontSize: 15,
+                                          color: Colors.red),
                                 ),
                               )
                             ],

@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'Trippo',
+      title: 'LogiTrust',
       theme: appTheme,
       routerConfig: router,
     );

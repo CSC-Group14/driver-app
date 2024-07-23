@@ -16,8 +16,8 @@ class AddFirestoreData {
   FirebaseFirestore db = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  void addDriversDataToFirestore(BuildContext context, String carName,
-      String carPlateNum, String carType) async {
+  void addDriversDataToFirestore(BuildContext context, String truckName,
+      String truckPlateNum, String truckType) async {
     try {
       await db
           .collection("Drivers")
@@ -25,9 +25,9 @@ class AddFirestoreData {
           .set({
         "name": FirebaseAuth.instance.currentUser!.email!.split("@")[0],
         "email": FirebaseAuth.instance.currentUser!.email,
-        "Car Name": carName,
-        "Car Plate Num": carPlateNum,
-        "Car Type": carType
+        "Truck Name": truckName,
+        "Truck Plate Num": truckPlateNum,
+        "Truck Type": truckType
       });
     } catch (e) {
       if (context.mounted) {
@@ -47,11 +47,11 @@ class AddFirestoreData {
           auth.currentUser!.uid,
           data.data()?["name"],
           data.data()?["email"],
-          data.data()?["Car Name"],
-          data.data()?["Car Plate Num"],
-          data.data()?["Car Type"]);
+          data.data()?["Truck Name"],
+          data.data()?["Truck Plate Num"],
+          data.data()?["Truck Type"]);
 
-      print("data is ${driver.carType}");
+      print("data is ${driver.truckType}");
     } catch (e) {
       if (context.mounted) {
         ErrorNotification().showError(context, "An Error Occurred $e");

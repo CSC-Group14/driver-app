@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 ThemeData appTheme = ThemeData(
     useMaterial3: true,
-    scaffoldBackgroundColor: Colors.black,
+    scaffoldBackgroundColor: Colors.white,
     textTheme: const TextTheme(
       bodySmall:
           TextStyle(color: Colors.black, fontFamily: "regular", fontSize: 16),

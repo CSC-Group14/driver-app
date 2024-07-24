@@ -15,6 +15,7 @@ final globalFirestoreRepoProvider = Provider<AddFirestoreData>((ref) {
 class AddFirestoreData {
   FirebaseFirestore db = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void addDriversDataToFirestore(BuildContext context, String truckName,
       String truckPlateNum, String truckType) async {
@@ -70,6 +71,26 @@ class AddFirestoreData {
         ErrorNotification().showError(context, "An Error Occurred $e");
       }
     }
+  }
+
+  void listenForRideRequests(Function(DocumentSnapshot) onNewRequest) {
+    _firestore
+        .collection('requests')
+        .where('status', isEqualTo: 'pending')
+        .snapshots()
+        .listen((snapshot) {
+      snapshot.docChanges.forEach((change) {
+        if (change.type == DocumentChangeType.added) {
+          onNewRequest(change.doc);
+        }
+      });
+    });
+  }
+
+  Future<void> updateRequestStatus(String requestId, String status) async {
+    await _firestore.collection('requests').doc(requestId).update({
+      'status': status,
+    });
   }
 
   void setDriverLocationStatus(BuildContext context, GeoPoint? loc) async {

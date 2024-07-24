@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logitrust_drivers/View/Screens/Main_Screens/History_Screen/history_screen.dart';
@@ -14,12 +15,25 @@ class NavigationScreen extends StatefulWidget {
 }
 
 class _NavigationScreenState extends State<NavigationScreen> {
+<<<<<<< HEAD
+  // These should be set with actual data when creating the NavigationScreen widget
+  final String destination = "Destination Example";
+  final GeoPoint userLocation = GeoPoint(0.0, 0.0);
+
+  List<Widget> get screens => [
+        HomeScreen(destination: destination, userLocation: userLocation),
+        const PaymentScreen(),
+        HistoryScreen(),
+        const ProfileScreen(),
+      ];
+=======
   List<Widget> screens = [
     const HomeScreen(),
     const PaymentScreen(),
     HistoryScreen(),
     const ProfileScreen(),
   ];
+>>>>>>> c9a33b5e2ac09e1fcac1b835954288358a73a367
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -49,9 +63,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
   }
 
   void _logout() {
-    // Implement your logout functionality here
-    // For example, you might clear user session data and navigate to the login screen
-    // Navigator.pushReplacementNamed(context, '/login');
     print("User logged out");
   }
 
@@ -124,20 +135,15 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 ),
                 ListTile(
                   leading: Icon(Icons.settings, color: Colors.blueAccent),
-                  title: Text(
-                    'Settings',
-                    style: TextStyle(color: Colors.black),
-                  ),
+                  title:
+                      Text('Settings', style: TextStyle(color: Colors.black)),
                   onTap: () {
                     // Navigate to settings page
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.help, color: Colors.blueAccent),
-                  title: Text(
-                    'Support',
-                    style: TextStyle(color: Colors.black),
-                  ),
+                  title: Text('Support', style: TextStyle(color: Colors.black)),
                   onTap: () {
                     // Navigate to support page
                   },

@@ -17,8 +17,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
   List<Widget> screens = [
     const HomeScreen(),
     const PaymentScreen(),
-    const HistoryScreen(),
-    const ProfileScreen()
+    HistoryScreen(),
+    const ProfileScreen(),
   ];
 
   void _showLogoutDialog(BuildContext context) {
@@ -103,7 +103,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 ),
                 ListTile(
                   leading: Icon(Icons.history, color: Colors.blueAccent),
-                  title: Text('History'),
+                  title: Text('Notifications'),
                   onTap: () {
                     ref
                         .watch(navigationStateProvider.notifier)

@@ -1,26 +1,53 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'View/Routes/app_routes.dart';
-import 'View/Themes/app_theme.dart';
+import 'package:logitrust_drivers/authentication/car_info_screen.dart';
+import 'package:logitrust_drivers/mainScreens/new_trip_screen.dart';
+import 'package:logitrust_drivers/splashScreen/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'InfoHandler/app_info.dart';
+import 'authentication/login_screen.dart';
+import 'authentication/register_screen.dart';
+import 'mainScreens/main_screen.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
-import 'firebase_options.dart';
-
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const ProviderScope(child: MyApp()));
+  await Firebase.initializeApp();
+ 
+  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  OneSignal.initialize("8919687a-effe-4f5f-929d-1cbac7845e8f");
+  OneSignal.Notifications.requestPermission(true);
+
+  runApp(ChangeNotifierProvider(
+    create: (context) => AppInfo(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  static final navigatorKey = GlobalKey<NavigatorState>();
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    String? screen;
+    OneSignal.Notifications.addClickListener((event) {
+      final data = event.notification.additionalData;
+      screen = data?['screen'];
+      if (screen != null) {
+        navigatorKey.currentState?.pushNamed(screen!);
+      }
+    },);
+    return MaterialApp(
+      navigatorKey: navigatorKey,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => MySplashScreen(),
+        '/main_screen': (context) => MainScreen(),
+        '/login_screen': (context) => const Login(),
+        '/register_screen': (context) => const Register(),
+        '/car_info_screen': (context) => CarInfoScreen(),
+        '/new_trip_screen': (context) => NewTripScreen(),
+      },
       debugShowCheckedModeBanner: false,
-      title: 'LogiTrust',
-      theme: appTheme,
-      routerConfig: router,
     );
   }
 }

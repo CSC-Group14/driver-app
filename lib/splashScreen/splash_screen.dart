@@ -11,22 +11,21 @@ class MySplashScreen extends StatefulWidget {
 }
 
 class _MySplashScreenState extends State<MySplashScreen> {
-
-  startTimer(){
+  startTimer() {
     //Fetching the User Data
-    firebaseAuth.currentUser != null ? AssistantMethods.readOnlineUserCurrentInfo() : null;
+    firebaseAuth.currentUser != null
+        ? AssistantMethods.readOnlineUserCurrentInfo()
+        : null;
 
-    Timer(const Duration(seconds: 5),() async {
-      if(await firebaseAuth.currentUser!=null){
+    Timer(const Duration(seconds: 5), () async {
+      if (await firebaseAuth.currentUser != null) {
         // send User to main screen
         currentFirebaseUser = firebaseAuth.currentUser;
         Navigator.pushNamed(context, '/main_screen');
-      }
-      else{
+      } else {
         // send User to login screen
         Navigator.pushNamed(context, '/login_screen');
       }
-
     });
   }
 
@@ -45,10 +44,8 @@ class _MySplashScreenState extends State<MySplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("images/Trippo Logo.png"),
-
+              Image.asset("images/logoo.png"),
               const SizedBox(height: 10),
-
             ],
           ),
         ),

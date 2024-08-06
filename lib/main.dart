@@ -15,7 +15,7 @@ void main() async {
   await Firebase.initializeApp();
  
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  OneSignal.initialize("8919687a-effe-4f5f-929d-1cbac7845e8f");
+  OneSignal.initialize("c23509de-1134-4a59-a802-3d5e133d16cf");
   OneSignal.Notifications.requestPermission(true);
 
   runApp(ChangeNotifierProvider(

@@ -47,10 +47,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAnsK0I2lw7YP3qhUthMBtlsiJ31WVkPrY"/>
-            
-        <meta-data
-        android:name="com.onesignal.NotificationOpenedHandler"
-        android:value=".NotificationOpenedHandler"/>
 
        <service
             android:name=".services.MyFirebaseMessagingService"

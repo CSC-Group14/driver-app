@@ -1,20 +1,18 @@
 import 'dart:async';
-import 'dart:ffi';
+
 import 'package:logitrust_drivers/assistants/assistant_methods.dart';
 import 'package:logitrust_drivers/global/global.dart';
-import 'package:logitrust_drivers/main.dart';
+
 import 'package:logitrust_drivers/push_notifications/push_notifications_system.dart';
-import 'package:logitrust_drivers/splashScreen/splash_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 
 class HomeTabPage extends StatefulWidget {
   const HomeTabPage({Key? key}) : super(key: key);
@@ -22,7 +20,6 @@ class HomeTabPage extends StatefulWidget {
   @override
   _HomeTabPageState createState() => _HomeTabPageState();
 }
-
 
 class _HomeTabPageState extends State<HomeTabPage> {
   GoogleMapController? newMapController;
@@ -36,10 +33,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
   var geoLocator = Geolocator();
   LocationPermission? _locationPermission;
 
-
-
-  checkIfLocationPermissionAllowed() async
-  {
+  checkIfLocationPermissionAllowed() async {
     _locationPermission = await Geolocator.requestPermission();
 
     if (_locationPermission == LocationPermission.denied) {
@@ -48,15 +42,21 @@ class _HomeTabPageState extends State<HomeTabPage> {
   }
 
   // Get Current Location of the driver
-  locateDriverPosition() async{
-    driverCurrentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    LatLng latLngPosition = LatLng(driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
+  locateDriverPosition() async {
+    driverCurrentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    LatLng latLngPosition = LatLng(
+        driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
 
-    CameraPosition cameraPosition = CameraPosition(target:latLngPosition, zoom: 16);
-    newMapController!.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    CameraPosition cameraPosition =
+        CameraPosition(target: latLngPosition, zoom: 16);
+    newMapController!
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
     //userName = currentUserInfo!.name!;
-    String humanReadableAddress = await AssistantMethods.searchAddressForGeographicCoordinates(driverCurrentPosition!,context);
+    String humanReadableAddress =
+        await AssistantMethods.searchAddressForGeographicCoordinates(
+            driverCurrentPosition!, context);
     print("this is your address = " + humanReadableAddress);
   }
 
@@ -64,25 +64,26 @@ class _HomeTabPageState extends State<HomeTabPage> {
   readCurrentDriverInformation() async {
     currentFirebaseUser = firebaseAuth.currentUser;
 
-    await FirebaseDatabase.instance.ref()
+    await FirebaseDatabase.instance
+        .ref()
         .child("Drivers")
         .child(currentFirebaseUser!.uid)
         .once()
         .then((snapData) {
-         DataSnapshot snapshot = snapData.snapshot;
-         if(snapshot.exists){
-           driverData.id = (snapshot.value as Map)["id"];
-           driverData.name = (snapshot.value as Map)["name"];
-           driverData.email = (snapshot.value as Map)["email"];
-           driverData.phone = (snapshot.value as Map)["phone"];
-           driverData.carColor = (snapshot.value as Map)["carDetails"]["carColor"];
-           driverData.carModel = (snapshot.value as Map)["carDetails"]["carModel"];
-           driverData.carNumber = (snapshot.value as Map)["carDetails"]["carNumber"];
-           driverData.carType = (snapshot.value as Map)["carDetails"]["carType"];
-           driverData.lastTripId = (snapshot.value as Map)["lastTripId"];
-           driverData.totalEarnings = (snapshot.value as Map)["totalEarnings"];
-         }
-
+      DataSnapshot snapshot = snapData.snapshot;
+      if (snapshot.exists) {
+        driverData.id = (snapshot.value as Map)["id"];
+        driverData.name = (snapshot.value as Map)["name"];
+        driverData.email = (snapshot.value as Map)["email"];
+        driverData.phone = (snapshot.value as Map)["phone"];
+        driverData.carColor = (snapshot.value as Map)["carDetails"]["carColor"];
+        driverData.carModel = (snapshot.value as Map)["carDetails"]["carModel"];
+        driverData.carNumber =
+            (snapshot.value as Map)["carDetails"]["carNumber"];
+        driverData.carType = (snapshot.value as Map)["carDetails"]["carType"];
+        driverData.lastTripId = (snapshot.value as Map)["lastTripId"];
+        driverData.totalEarnings = (snapshot.value as Map)["totalEarnings"];
+      }
     });
 
     AssistantMethods.getLastTripInformation(context);
@@ -95,7 +96,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
     // Get Driver Ratings
     AssistantMethods.getDriverRating(context);
   }
-  
 
   @override
   void initState() {
@@ -121,7 +121,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
             locateDriverPosition();
           },
         ),
-
         statusText != "Online"
             ? Container(
                 height: MediaQuery.of(context).size.height,
@@ -129,68 +128,59 @@ class _HomeTabPageState extends State<HomeTabPage> {
                 color: Colors.black54,
               )
             : Container(),
-
         Positioned(
           top: statusText != "Online"
               ? MediaQuery.of(context).size.height * 0.46
               : 35,
           left: 0,
           right: 0,
-
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: (){
-                  if(statusText != "Online"){ // Offline
-                    driverIsOnlineNow();
-                    updateDriversLocationAtRealTime();
+                  onPressed: () {
+                    if (statusText != "Online") {
+                      // Offline
+                      driverIsOnlineNow();
+                      updateDriversLocationAtRealTime();
 
-                    setState(() {
-                      statusText = "Online";
-                      isDriverActive = true;
-                      buttonColor = Colors.black;
-                    });
+                      setState(() {
+                        statusText = "Online";
+                        isDriverActive = true;
+                        buttonColor = Colors.black;
+                      });
 
-                    Fluttertoast.showToast(msg: "You are online now");
-                  }
+                      Fluttertoast.showToast(msg: "You are online now");
+                    } else {
+                      driverIsOfflineNow();
+                      setState(() {
+                        statusText = "Offline";
+                        isDriverActive = false;
+                        buttonColor = Colors.black;
+                      });
 
-                  else{
-                    driverIsOfflineNow();
-                    setState(() {
-                      statusText = "Offline";
-                      isDriverActive = false;
-                      buttonColor = Colors.black;
-                    });
-
-                    Fluttertoast.showToast(msg: "You are offline now");
-                  }
-
-                },
-
-                style: ElevatedButton.styleFrom(
-                   backgroundColor: buttonColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 32,vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(26)
-                  )
-                ),
-
-                child: statusText != "Online"
-                    ? Text(
-                        statusText,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white
-                        ),
-                      )
-                    : const Icon(
-                       Icons.phonelink_ring,
-                       color: Colors.white,
-                       size: 30,
-                      )
-              )
+                      Fluttertoast.showToast(msg: "You are offline now");
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(26))),
+                  child: statusText != "Online"
+                      ? Text(
+                          statusText,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        )
+                      : const Icon(
+                          Icons.phonelink_ring,
+                          color: Colors.white,
+                          size: 30,
+                        ))
             ],
           ),
         )
@@ -198,48 +188,50 @@ class _HomeTabPageState extends State<HomeTabPage> {
     );
   }
 
-  driverIsOnlineNow() async{
-    driverCurrentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    
-    Geofire.initialize("ActiveDrivers"); // Setting up a new node in realtime database
-    Geofire.setLocation(currentFirebaseUser!.uid, driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
-    
-    DatabaseReference reference = FirebaseDatabase.instance.ref()
-        .child("Drivers").child(currentFirebaseUser!.uid).child("newRideStatus");
+  driverIsOnlineNow() async {
+    driverCurrentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    Geofire.initialize(
+        "ActiveDrivers"); // Setting up a new node in realtime database
+    Geofire.setLocation(currentFirebaseUser!.uid,
+        driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
+
+    DatabaseReference reference = FirebaseDatabase.instance
+        .ref()
+        .child("Drivers")
+        .child(currentFirebaseUser!.uid)
+        .child("newRideStatus");
 
     reference.set("Idle");
-    reference.onValue.listen((event) { });
-
-
+    reference.onValue.listen((event) {});
   }
 
-  driverIsOfflineNow() async{
-    Geofire.removeLocation(currentFirebaseUser!.uid); // ActiveDrivers child with this id deleted from Realtime Firebase
+  driverIsOfflineNow() async {
+    Geofire.removeLocation(currentFirebaseUser!
+        .uid); // ActiveDrivers child with this id deleted from Realtime Firebase
 
-    DatabaseReference? reference = FirebaseDatabase.instance.ref()
-        .child("Drivers").child(currentFirebaseUser!.uid).child("newRideStatus");
+    DatabaseReference? reference = FirebaseDatabase.instance
+        .ref()
+        .child("Drivers")
+        .child(currentFirebaseUser!.uid)
+        .child("newRideStatus");
 
     reference.onDisconnect();
     reference.remove(); // child newRideStatus removed
     reference = null;
-
   }
 
-  updateDriversLocationAtRealTime()
-  {
-    streamSubscriptionPosition = Geolocator.getPositionStream() // Get Updated position of the driver
-        .listen((Position position)
-    {
+  updateDriversLocationAtRealTime() {
+    streamSubscriptionPosition =
+        Geolocator.getPositionStream() // Get Updated position of the driver
+            .listen((Position position) {
       driverCurrentPosition = position;
 
-      if(isDriverActive == true)
-      {
-        Geofire.setLocation  // Updating live location in realtime database
-        (
-            currentFirebaseUser!.uid,
-            driverCurrentPosition!.latitude,
-            driverCurrentPosition!.longitude
-        );
+      if (isDriverActive == true) {
+        Geofire.setLocation // Updating live location in realtime database
+            (currentFirebaseUser!.uid, driverCurrentPosition!.latitude,
+                driverCurrentPosition!.longitude);
       }
 
       LatLng latLng = LatLng(
@@ -247,9 +239,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
         driverCurrentPosition!.longitude,
       );
 
-      newMapController!.animateCamera(CameraUpdate.newLatLng(latLng)); // Animating camera in google map according to LatLng
+      newMapController!.animateCamera(CameraUpdate.newLatLng(
+          latLng)); // Animating camera in google map according to LatLng
     });
   }
-
-
 }

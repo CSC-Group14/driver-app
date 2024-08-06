@@ -47,26 +47,32 @@ class _NewTripScreenState extends State<NewTripScreen> {
   String durationFromSourceToDestination = "";
   bool isRequestDirectionDetails = false;
 
-  Future<void> drawPolylineFromSourceToDestination(LatLng source, LatLng destination) async {
+  Future<void> drawPolylineFromSourceToDestination(
+      LatLng source, LatLng destination) async {
     if (source == null || destination == null) return;
 
     showDialog(
       context: context,
-      builder: (BuildContext context) => ProgressDialog(message: 'Please wait..'),
+      builder: (BuildContext context) =>
+          ProgressDialog(message: 'Please wait..'),
     );
 
-    var directionDetailsInfo = await AssistantMethods.getOriginToDestinationDirectionDetails(source, destination);
+    var directionDetailsInfo =
+        await AssistantMethods.getOriginToDestinationDirectionDetails(
+            source, destination);
     Navigator.pop(context);
 
     if (directionDetailsInfo == null) return;
 
     PolylinePoints polylinePoints = PolylinePoints();
-    List<PointLatLng> decodedPolyLinePointsList = polylinePoints.decodePolyline(directionDetailsInfo.e_points!);
+    List<PointLatLng> decodedPolyLinePointsList =
+        polylinePoints.decodePolyline(directionDetailsInfo.e_points!);
     polyLineCoordinatesList.clear();
 
     if (decodedPolyLinePointsList.isNotEmpty) {
       decodedPolyLinePointsList.forEach((PointLatLng pointLatLng) {
-        polyLineCoordinatesList.add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
+        polyLineCoordinatesList
+            .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
       });
     }
 
@@ -87,7 +93,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
     });
 
     LatLngBounds boundsLatLng;
-    if (source.latitude > destination.latitude && source.longitude > destination.longitude) {
+    if (source.latitude > destination.latitude &&
+        source.longitude > destination.longitude) {
       boundsLatLng = LatLngBounds(southwest: destination, northeast: source);
     } else if (source.longitude > destination.longitude) {
       boundsLatLng = LatLngBounds(
@@ -104,22 +111,21 @@ class _NewTripScreenState extends State<NewTripScreen> {
     }
 
     if (newTripMapController != null) {
-      newTripMapController!.animateCamera(CameraUpdate.newLatLngBounds(boundsLatLng, 65));
+      newTripMapController!
+          .animateCamera(CameraUpdate.newLatLngBounds(boundsLatLng, 65));
     }
 
     Marker originMarker = Marker(
-      markerId: const MarkerId("sourceID"),
-      position: source,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      infoWindow: InfoWindow(title: "Source")
-    );
+        markerId: const MarkerId("sourceID"),
+        position: source,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        infoWindow: InfoWindow(title: "Source"));
 
     Marker destinationMarker = Marker(
-      markerId: const MarkerId("destinationID"),
-      position: destination,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-      infoWindow: InfoWindow(title: "Destination")
-    );
+        markerId: const MarkerId("destinationID"),
+        position: destination,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        infoWindow: InfoWindow(title: "Destination"));
 
     setState(() {
       setOfMarkers.add(originMarker);
@@ -161,26 +167,34 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
     if (driverLiveLocation == null || widget.rideRequest == null) return;
 
-    var currentDriverPositionLatLng = LatLng(driverLiveLocation!.latitude, driverLiveLocation!.longitude);
+    var currentDriverPositionLatLng =
+        LatLng(driverLiveLocation!.latitude, driverLiveLocation!.longitude);
 
-    var tripDirectionDetailsInfo = await AssistantMethods.getOriginToDestinationDirectionDetails(
-        currentDriverPositionLatLng,
-        widget.rideRequest!.source!
-    );
+    var tripDirectionDetailsInfo =
+        await AssistantMethods.getOriginToDestinationDirectionDetails(
+            currentDriverPositionLatLng, widget.rideRequest!.source!);
 
     if (tripDirectionDetailsInfo == null) return;
 
-    Fluttertoast.showToast(msg: "KM:" + tripDirectionDetailsInfo.duration_text! + " Time:" + tripDirectionDetailsInfo.distance_text!);
+    Fluttertoast.showToast(
+        msg: "KM:" +
+            tripDirectionDetailsInfo.duration_text! +
+            " Time:" +
+            tripDirectionDetailsInfo.distance_text!);
 
-    double? fareAmount = AssistantMethods.calculateFareAmountFromSourceToDestination(tripDirectionDetailsInfo, driverData.carType);
+    double? fareAmount =
+        AssistantMethods.calculateFareAmountFromSourceToDestination(
+            tripDirectionDetailsInfo, driverData.carType);
 
-    FirebaseDatabase.instance.ref()
+    FirebaseDatabase.instance
+        .ref()
         .child("AllRideRequests")
         .child(widget.rideRequest!.id)
         .child("status")
         .set("Ended");
 
-    FirebaseDatabase.instance.ref()
+    FirebaseDatabase.instance
+        .ref()
         .child("AllRideRequests")
         .child(widget.rideRequest!.id)
         .child("fareAmount")
@@ -193,38 +207,38 @@ class _NewTripScreenState extends State<NewTripScreen> {
     Navigator.pop(context);
 
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return FareAmountDialog(
-          fareAmount: fareAmount,
-          userName: widget.rideRequest!.userName
-        );
-      }
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return FareAmountDialog(
+              fareAmount: fareAmount, userName: widget.rideRequest!.userName);
+        });
 
-    FirebaseDatabase.instance.ref()
+    FirebaseDatabase.instance
+        .ref()
         .child("Drivers")
         .child(currentFirebaseUser!.uid)
         .child("totalEarnings")
         .once()
         .then((snapData) {
-          DataSnapshot snapshot = snapData.snapshot;
-          if (snapshot.exists) {
-            double previousEarnings = double.parse(snapshot.value.toString());
-            double totalEarning = previousEarnings + fareAmount;
-            FirebaseDatabase.instance.ref()
-                .child("Drivers")
-                .child(currentFirebaseUser!.uid)
-                .child("totalEarnings")
-                .set(totalEarning.toString());
-          } else {
-            FirebaseDatabase.instance.ref()
-                .child("Drivers")
-                .child(currentFirebaseUser!.uid)
-                .child("totalEarnings")
-                .set(fareAmount.toString());
-          }
-        });
+      DataSnapshot snapshot = snapData.snapshot;
+      if (snapshot.exists) {
+        double previousEarnings = double.parse(snapshot.value.toString());
+        double totalEarning = previousEarnings + fareAmount;
+        FirebaseDatabase.instance
+            .ref()
+            .child("Drivers")
+            .child(currentFirebaseUser!.uid)
+            .child("totalEarnings")
+            .set(totalEarning.toString());
+      } else {
+        FirebaseDatabase.instance
+            .ref()
+            .child("Drivers")
+            .child(currentFirebaseUser!.uid)
+            .child("totalEarnings")
+            .set(fareAmount.toString());
+      }
+    });
   }
 
   @override
@@ -258,36 +272,39 @@ class _NewTripScreenState extends State<NewTripScreen> {
               });
 
               if (driverCurrentPosition != null && widget.rideRequest != null) {
-              var driverCurrentLatLng = LatLng(driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
+                var driverCurrentLatLng = LatLng(
+                    driverCurrentPosition!.latitude,
+                    driverCurrentPosition!.longitude);
 
-              // Debug log to check what source contains
-              print("Source: ${widget.rideRequest!.source}");
+                // Debug log to check what source contains
+                print("Source: ${widget.rideRequest!.source}");
 
-              var source = widget.rideRequest!.source;
+                var source = widget.rideRequest!.source;
 
-              if (source != null) {
-                // Check if source is a LatLng object or Map
-                LatLng sourceLatLng;
-                if (source is LatLng) {
-                  sourceLatLng = source;
-                } else if (source is Map<String, dynamic>) {
-                  // Convert Map to LatLng
-                  sourceLatLng =
+                if (source != null) {
+                  // Check if source is a LatLng object or Map
+                  LatLng sourceLatLng;
+                  if (source is LatLng) {
+                    sourceLatLng = source;
+                  } else if (source is Map<String, dynamic>) {
+                    // Convert Map to LatLng
+                    sourceLatLng = sourceLatLng =
+                        LatLng(source.latitude, source.longitude);
+                  } else {
+                    // Invalid format
+                    Fluttertoast.showToast(
+                        msg: "Invalid source location format.");
+                    return;
+                  }
 
-                  sourceLatLng = LatLng(source.latitude, source.longitude);
+                  drawPolylineFromSourceToDestination(
+                      driverCurrentLatLng, sourceLatLng);
                 } else {
-                  // Invalid format
-                  Fluttertoast.showToast(msg: "Invalid source location format.");
-                  return;
+                  Fluttertoast.showToast(msg: "Source location not available.");
                 }
 
-                drawPolylineFromSourceToDestination(driverCurrentLatLng, sourceLatLng);
-              } else {
-                Fluttertoast.showToast(msg: "Source location not available.");
+                updateDriversLocationAtRealTime();
               }
-
-              updateDriversLocationAtRealTime();
-            }
             },
           ),
           Positioned(
@@ -318,7 +335,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
                         color: Colors.black,
                       ),
                     ),
-                    const SizedBox(height: 18,),
+                    const SizedBox(
+                      height: 18,
+                    ),
                     const Divider(
                       thickness: 2,
                       height: 2,
@@ -344,7 +363,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12,),
+                    const SizedBox(
+                      height: 12,
+                    ),
                     Row(
                       children: [
                         Image.asset(
@@ -352,7 +373,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
                           width: 30,
                           height: 30,
                         ),
-                        const SizedBox(width: 14,),
+                        const SizedBox(
+                          width: 14,
+                        ),
                         Expanded(
                           child: Container(
                             child: Text(
@@ -374,11 +397,14 @@ class _NewTripScreenState extends State<NewTripScreen> {
                           width: 30,
                           height: 30,
                         ),
-                        const SizedBox(width: 14,),
+                        const SizedBox(
+                          width: 14,
+                        ),
                         Expanded(
                           child: Container(
                             child: Text(
-                              widget.rideRequest?.destinationAddress ?? 'Address',
+                              widget.rideRequest?.destinationAddress ??
+                                  'Address',
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
@@ -388,7 +414,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 30,),
+                    const SizedBox(
+                      height: 30,
+                    ),
                     const Divider(
                       thickness: 2,
                       height: 2,
@@ -406,7 +434,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
                             buttonColor = Colors.green;
                           });
 
-                          FirebaseDatabase.instance.ref()
+                          FirebaseDatabase.instance
+                              .ref()
                               .child("AllRideRequests")
                               .child(widget.rideRequest!.id)
                               .child("status")
@@ -421,8 +450,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
                           await drawPolylineFromSourceToDestination(
                               widget.rideRequest!.source!,
-                              widget.rideRequest!.destination!
-                          );
+                              widget.rideRequest!.destination!);
 
                           Navigator.pop(context);
                         } else if (rideRequestStatus == "Arrived") {
@@ -432,7 +460,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
                             buttonColor = Colors.redAccent;
                           });
 
-                          FirebaseDatabase.instance.ref()
+                          FirebaseDatabase.instance
+                              .ref()
                               .child("AllRideRequests")
                               .child(widget.rideRequest!.id)
                               .child("status")
@@ -470,7 +499,10 @@ class _NewTripScreenState extends State<NewTripScreen> {
   saveAssignedDriverDetailsToRideRequest() {
     if (widget.rideRequest == null) return;
 
-    DatabaseReference reference = FirebaseDatabase.instance.ref().child("AllRideRequests").child(widget.rideRequest!.id);
+    DatabaseReference reference = FirebaseDatabase.instance
+        .ref()
+        .child("AllRideRequests")
+        .child(widget.rideRequest!.id);
 
     Map driverCarDetailsMap = {
       "carColor": driverData.carColor,
@@ -495,15 +527,21 @@ class _NewTripScreenState extends State<NewTripScreen> {
   }
 
   saveRideRequestId() {
-    DatabaseReference reference = FirebaseDatabase.instance.ref().child("Drivers").child(currentFirebaseUser!.uid).child("tripHistory");
+    DatabaseReference reference = FirebaseDatabase.instance
+        .ref()
+        .child("Drivers")
+        .child(currentFirebaseUser!.uid)
+        .child("tripHistory");
 
     reference.child(widget.rideRequest!.id).set(true);
   }
 
   createActiveDriverIconMarker() {
     if (driverIconMarker == null) {
-      ImageConfiguration imageConfiguration = createLocalImageConfiguration(context, size: const Size(2, 2));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, "images/car-2.png").then((value) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: const Size(2, 2));
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "images/truck-2.png")
+          .then((value) {
         driverIconMarker = value;
       });
     }
@@ -511,8 +549,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
   updateDriversLocationAtRealTime() {
     Fluttertoast.showToast(msg: "Inside updateDriversLocationAtRealTime()");
-    streamSubscriptionPosition = Geolocator.getPositionStream()
-        .listen((Position position) {
+    streamSubscriptionPosition =
+        Geolocator.getPositionStream().listen((Position position) {
       driverCurrentPosition = position;
       driverLiveLocation = position;
 
@@ -528,13 +566,15 @@ class _NewTripScreenState extends State<NewTripScreen> {
             markerId: const MarkerId("animatingCarMarker"),
             position: driverLivePositionLatLng,
             icon: driverIconMarker!,
-            infoWindow: InfoWindow(title: "Your Location")
-        );
+            infoWindow: InfoWindow(title: "Your Location"));
 
         setState(() {
-          CameraPosition cameraPosition = CameraPosition(target: driverLivePositionLatLng, zoom: 16);
-          newTripMapController?.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-          setOfMarkers.removeWhere((element) => element.markerId.value == "animatingCarMarker");
+          CameraPosition cameraPosition =
+              CameraPosition(target: driverLivePositionLatLng, zoom: 16);
+          newTripMapController
+              ?.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+          setOfMarkers.removeWhere(
+              (element) => element.markerId.value == "animatingCarMarker");
           setOfMarkers.add(animatingCarMarker);
         });
 
@@ -562,14 +602,17 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
       if (driverLiveLocation == null) return;
 
-      var sourceLatLng = LatLng(driverLiveLocation!.latitude, driverLiveLocation!.longitude);
+      var sourceLatLng =
+          LatLng(driverLiveLocation!.latitude, driverLiveLocation!.longitude);
       var destinationLatLng = rideRequestStatus == "Accepted"
           ? widget.rideRequest?.source
           : widget.rideRequest?.destination;
 
       if (destinationLatLng == null) return;
 
-      var directionDetailsInfo = await AssistantMethods.getOriginToDestinationDirectionDetails(sourceLatLng, destinationLatLng);
+      var directionDetailsInfo =
+          await AssistantMethods.getOriginToDestinationDirectionDetails(
+              sourceLatLng, destinationLatLng);
 
       if (directionDetailsInfo != null) {
         setState(() {

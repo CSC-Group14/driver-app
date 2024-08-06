@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:http/http.dart';
+
 import 'package:logitrust_drivers/mainScreens/new_trip_screen.dart';
 import 'package:logitrust_drivers/models/riderequest.dart';
-import 'package:logitrust_drivers/tabPages/trips.dart';
+
 // Import the NewTripScreen
 
 class NotificationPage extends StatefulWidget {
@@ -12,7 +12,8 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
-  final DatabaseReference _rideRequestsRef = FirebaseDatabase.instance.ref().child('AllRideRequests');
+  final DatabaseReference _rideRequestsRef =
+      FirebaseDatabase.instance.ref().child('AllRideRequests');
   late Stream<DatabaseEvent> _rideRequestsStream;
 
   @override
@@ -33,7 +34,8 @@ class _NotificationPageState extends State<NotificationPage> {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
+          } else if (!snapshot.hasData ||
+              snapshot.data!.snapshot.value == null) {
             return Center(child: Text('No ride requests available.'));
           } else {
             // Parse ride requests
@@ -44,7 +46,6 @@ class _NotificationPageState extends State<NotificationPage> {
                 id: entry.key.toString(),
                 destinationAddress: request['destinationAddress'] ?? '',
                 sourceAddress: request['sourceAddress'] ?? '',
-                
                 time: request['time'] ?? '',
                 userName: request['userName'] ?? '',
                 userPhone: request['userPhone'] ?? '',
@@ -60,7 +61,8 @@ class _NotificationPageState extends State<NotificationPage> {
                   child: ListTile(
                     contentPadding: EdgeInsets.all(16),
                     title: Text(request.userName),
-                    subtitle: Text('From: ${request.sourceAddress}\nTo: ${request.destinationAddress}\nTime: ${request.time}'),
+                    subtitle: Text(
+                        'From: ${request.sourceAddress}\nTo: ${request.destinationAddress}\nTime: ${request.time}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -88,27 +90,25 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   // Method to handle the acceptance of a ride
- void _acceptRide(RideRequest request) async {
-  try {
-    // Update the ride request status in the database
-    await _rideRequestsRef.child(request.id).update({
-      'status': 'Accepted',
-    });
+  void _acceptRide(RideRequest request) async {
+    try {
+      // Update the ride request status in the database
+      await _rideRequestsRef.child(request.id).update({
+        'status': 'Accepted',
+      });
 
-    // Navigate to the TripScreen with the ride request details
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => NewTripScreen(
-          rideRequest: request, // Use the request passed as a parameter
+      // Navigate to the TripScreen with the ride request details
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NewTripScreen(
+            rideRequest: request, // Use the request passed as a parameter
+          ),
         ),
-      ),
-    );
-  } catch (e) {
-    print('Error updating ride status: $e');
-    // Optionally show an error message to the user
+      );
+    } catch (e) {
+      print('Error updating ride status: $e');
+      // Optionally show an error message to the user
+    }
   }
 }
-}
-
-

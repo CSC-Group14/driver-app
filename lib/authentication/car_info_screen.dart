@@ -14,7 +14,7 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
       TextEditingController();
   TextEditingController carColorTextEditingController = TextEditingController();
 
-  List<String> carTypesList = ["UberX", "Uber Premier", "Bike"];
+  List<String> carTypesList = ["large", "medium", "small"];
   String? selectedCarType;
 
   saveCarInfo() async {
@@ -24,7 +24,7 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
     }
 
     if (selectedCarType == null) {
-      Fluttertoast.showToast(msg: "Please select a car type");
+      Fluttertoast.showToast(msg: "Please select a Truck type");
       return;
     }
 
@@ -43,10 +43,10 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
           .child("carDetails")
           .set(driverCarInfoMap);
 
-      Fluttertoast.showToast(msg: "Car Details have been saved");
+      Fluttertoast.showToast(msg: "Truck Details have been saved");
       Navigator.pushNamed(context, '/');
     } catch (error) {
-      Fluttertoast.showToast(msg: "Error saving car details: $error");
+      Fluttertoast.showToast(msg: "Error saving truck details: $error");
     }
   }
 
@@ -62,11 +62,11 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
               const SizedBox(height: 24),
               Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Image.asset("images/Trippo Logo.png"),
+                child: Image.asset("images/logoo.png"),
               ),
               const SizedBox(height: 10),
               const Text(
-                "Write Car Details",
+                "Write Truck Details",
                 style: TextStyle(
                   fontSize: 26,
                   color: Colors.black,
@@ -77,8 +77,8 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 controller: carModelTextEditingController,
                 style: const TextStyle(color: Colors.black),
                 decoration: const InputDecoration(
-                  labelText: "Car Model",
-                  hintText: "Car Model",
+                  labelText: "Truck Model",
+                  hintText: "Truck Model",
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black),
                   ),
@@ -94,8 +94,8 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 controller: carNumberTextEditingController,
                 style: const TextStyle(color: Colors.black),
                 decoration: const InputDecoration(
-                  labelText: "Car Number",
-                  hintText: "Car Number",
+                  labelText: "Truck Number",
+                  hintText: "Truck Number",
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black),
                   ),
@@ -111,8 +111,8 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 controller: carColorTextEditingController,
                 style: const TextStyle(color: Colors.black),
                 decoration: const InputDecoration(
-                  labelText: "Car Color",
-                  hintText: "Car Color",
+                  labelText: "Truck Color",
+                  hintText: "Truck Color",
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black),
                   ),
@@ -128,7 +128,7 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 iconSize: 26,
                 dropdownColor: Colors.white,
                 hint: const Text(
-                  "Please choose Car Type",
+                  "Please choose Truck Type",
                   style: TextStyle(fontSize: 14.0, color: Colors.black),
                 ),
                 value: selectedCarType,
@@ -155,7 +155,7 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                     saveCarInfo();
                   } else {
                     Fluttertoast.showToast(
-                        msg: "Please fill all fields and select a car type");
+                        msg: "Please fill all fields and select a truck type");
                   }
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.black),

@@ -1,230 +1,218 @@
-import 'package:assets_audio_player/assets_audio_player.dart';
-
-import 'package:logitrust_drivers/global/global.dart';
-import 'package:logitrust_drivers/mainScreens/new_trip_screen.dart';
-import 'package:firebase_database/firebase_database.dart';
-
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:logitrust_drivers/models/riderequest.dart';
 
-import '../models/ride_request_information.dart';
+class RideRequestDialog extends StatefulWidget {
+  final String rideRequestId;
 
-class NotificationDialogBox extends StatefulWidget {
-  RideRequestInformation? rideRequestInformation;
-
-  NotificationDialogBox({this.rideRequestInformation});
+  RideRequestDialog({required this.rideRequestId});
 
   @override
-  State<NotificationDialogBox> createState() => _NotificationDialogBoxState();
+  _RideRequestDialogState createState() => _RideRequestDialogState();
 }
 
-class _NotificationDialogBoxState extends State<NotificationDialogBox> {
+class _RideRequestDialogState extends State<RideRequestDialog> {
+  late DatabaseReference _rideRequestRef;
+  RideRequest? _rideRequest;
+
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
-      backgroundColor: Colors.transparent,
-      elevation: 2,
-      child: Container(
-          margin: const EdgeInsets.all(8.0),
-          width: double.infinity,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10), color: Colors.black),
-          child: Column(
-            mainAxisSize:
-                MainAxisSize.min, // Resizes the layout according to the need
-            children: [
-              const SizedBox(height: 15),
+  void initState() {
+    super.initState();
+    _rideRequestRef = FirebaseDatabase.instance
+        .ref()
+        .child("AllRideRequests")
+        .child(widget.rideRequestId);
 
-              // image
-              Image.asset('images/icon.png', width: 160),
-
-              const SizedBox(height: 10),
-
-              // New Ride Request Text
-              const Text(
-                "New Ride Request",
-                style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-
-              const SizedBox(height: 15),
-
-              // Pickup/Destination Address
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    // Pickup Details
-                    Row(
-                      children: [
-                        Image.asset(
-                          'images/source.png',
-                          width: 25,
-                          height: 25,
-                        ),
-                        const SizedBox(width: 22),
-                        Expanded(
-                          child: Container(
-                            child: Text(
-                              widget.rideRequestInformation!.sourceAddress!,
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 25),
-
-                    // Destination Details
-                    Row(
-                      children: [
-                        Image.asset(
-                          'images/destination.png',
-                          width: 25,
-                          height: 25,
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Container(
-                            child: Text(
-                              widget
-                                  .rideRequestInformation!.destinationAddress!,
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // buttons
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red),
-                        onPressed: () {
-                          // Cancel the ride request
-                          audioPlayer.pause();
-                          audioPlayer.stop();
-                          audioPlayer = AssetsAudioPlayer();
-
-                          // Then ensures that all after the first firebase query, next one is executed
-                          FirebaseDatabase.instance
-                              .ref()
-                              .child("AllRideRequests")
-                              .child(
-                                  widget.rideRequestInformation!.rideRequestId!)
-                              .remove()
-                              .then((value) {
-                                FirebaseDatabase.instance
-                                    .ref()
-                                    .child("Drivers")
-                                    .child(currentFirebaseUser!.uid)
-                                    .child("newRideStatus")
-                                    .set("idle");
-                              })
-                              .then((value) => {
-                                    FirebaseDatabase.instance
-                                        .ref()
-                                        .child("Drivers")
-                                        .child(currentFirebaseUser!.uid)
-                                        .child("tripHistory")
-                                        .child(widget.rideRequestInformation!
-                                            .rideRequestId!)
-                                        .remove()
-                                  })
-                              .then((value) => {
-                                    Fluttertoast.showToast(
-                                        msg:
-                                            "Ride request is cancelled, restarting app")
-                                  });
-
-                          Navigator.pop(context);
-                        },
-                        child: const Text(
-                          "Cancel",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        )),
-                    const SizedBox(width: 20),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue),
-                        onPressed: () async {
-                          // Accept the ride request
-                          audioPlayer.pause();
-                          audioPlayer.stop();
-                          audioPlayer = AssetsAudioPlayer();
-
-                          // Driver has accepted the ride request
-                          await acceptRideRequest(context);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (c) => NewTripScreen()));
-                        },
-                        child: const Text(
-                          "Accept",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ))
-                  ],
-                ),
-              )
-            ],
-          )),
-    );
+    _fetchRideRequestData();
   }
 
-  acceptRideRequest(BuildContext context) {
-    String rideRequestId = "";
-    FirebaseDatabase.instance
-        .ref()
-        .child("Drivers")
-        .child(currentFirebaseUser!.uid)
-        .child("newRideStatus")
-        .once()
-        .then((snapData) {
-      DataSnapshot snapshot = snapData.snapshot;
-      if (snapshot.exists) {
-        rideRequestId = snapshot.value.toString();
+  void _fetchRideRequestData() {
+    _rideRequestRef.once().then((DatabaseEvent event) {
+      if (event.snapshot.value != null) {
+        final data = event.snapshot.value as Map<dynamic, dynamic>;
+        final rideRequest = RideRequest.fromMap(data);
+
+        if (rideRequest.status == 'Pending') {
+          setState(() {
+            _rideRequest = rideRequest;
+          });
+        } else {
+          // Close the dialog if the status is not pending
+          Navigator.of(context).pop();
+        }
       } else {
-        Fluttertoast.showToast(msg: "Ride request does not exist");
+        // Handle case when data does not exist
+        setState(() {
+          _rideRequest = null; // or show an appropriate message
+        });
       }
-
-      if (rideRequestId == widget.rideRequestInformation!.rideRequestId!) {
-        FirebaseDatabase.instance
-            .ref()
-            .child("Drivers")
-            .child(currentFirebaseUser!.uid)
-            .child("newRideStatus")
-            .set("Accepted");
-
-        //AssistantMethods.pauseLiveLocationUpdates();
-        Fluttertoast.showToast(msg: "Paused live location updates");
-      } else {}
+    }).catchError((error) {
+      print("Error fetching ride request data: $error");
     });
   }
+
+  void _acceptRideRequest() {
+    _rideRequestRef.once().then((DatabaseEvent event) {
+      if (event.snapshot.value != null) {
+        final data = event.snapshot.value as Map<dynamic, dynamic>;
+        final rideRequest = RideRequest.fromMap(data);
+
+        if (rideRequest.status == 'Pending') {
+          // Update the status to accepted
+          _rideRequestRef.update({
+            'status': 'Accepted',
+            'acceptedBy': 'DriverID', // Replace 'DriverID' with the actual driver ID
+          }).then((_) {
+            Navigator.of(context).pop(); // Close the dialog
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Ride request accepted.')),
+            );
+          }).catchError((error) {
+            print("Error accepting ride request: $error");
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('This ride request has already been handled.')),
+          );
+          Navigator.of(context).pop(); // Close the dialog
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ride request not found.')),
+        );
+        Navigator.of(context).pop(); // Close the dialog
+      }
+    }).catchError((error) {
+      print("Error fetching ride request data: $error");
+    });
+  }
+
+  void _declineRideRequest() {
+    _rideRequestRef.update({'status': 'Declined'}).then((_) {
+      Navigator.of(context).pop(); // Close the dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ride request declined.')),
+      );
+    }).catchError((error) {
+      print("Error declining ride request: $error");
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("New Ride Request"),
+      content: _rideRequest == null
+          ? CircularProgressIndicator()
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Pickup Details
+                  Row(
+                    children: [
+                      Image.asset(
+                        'images/source.png',
+                        width: 25,
+                        height: 25,
+                      ),
+                      const SizedBox(width: 22),
+                      Expanded(
+                        child: Container(
+                          child: Text(
+                            "Source Address: ${_rideRequest!.sourceAddress}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 25),
+                  // Destination Details
+                  Row(
+                    children: [
+                      Image.asset(
+                        'images/destination.png',
+                        width: 25,
+                        height: 25,
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Container(
+                          child: Text(
+                            "Destination Address: ${_rideRequest!.destinationAddress}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+      actions: [
+        TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.blue,
+          ),
+          onPressed: _acceptRideRequest,
+          child: const Text(
+            "Accept",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.red,
+          ),
+          onPressed: _declineRideRequest,
+          child: const Text(
+            "Decline",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.green,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            "Cancel",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+void showRideRequestDialog(BuildContext context, String rideRequestId) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return RideRequestDialog(rideRequestId: rideRequestId);
+    },
+  );
 }

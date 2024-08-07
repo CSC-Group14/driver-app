@@ -4,7 +4,7 @@ import '../assistants/assistant_methods.dart';
 import '../global/global.dart';
 
 class MySplashScreen extends StatefulWidget {
-  const MySplashScreen({Key? key}) : super(key: key);
+  const MySplashScreen({super.key});
 
   @override
   State<MySplashScreen> createState() => _MySplashScreenState();
@@ -18,7 +18,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
         : null;
 
     Timer(const Duration(seconds: 5), () async {
-      if (await firebaseAuth.currentUser != null) {
+      if (firebaseAuth.currentUser != null) {
         // send User to main screen
         currentFirebaseUser = firebaseAuth.currentUser;
         Navigator.pushNamed(context, '/main_screen');

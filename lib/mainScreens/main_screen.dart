@@ -5,6 +5,8 @@ import 'package:logitrust_drivers/tabPages/profile_tab.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -33,7 +35,7 @@ class _MainScreenState extends State<MainScreen>
       body: TabBarView(
         physics: const NeverScrollableScrollPhysics(),
         controller: tabController,
-        children: [
+        children:  const [
           HomeTabPage(),
           NotificationPage(),
           NewTripScreen(),

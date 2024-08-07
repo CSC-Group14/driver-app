@@ -20,12 +20,14 @@ void main() async {
 
   runApp(ChangeNotifierProvider(
     create: (context) => AppInfo(),
-    child: MyApp(),
+    child: const MyApp(),
   ));
 }
 
 class MyApp extends StatelessWidget {
   static final navigatorKey = GlobalKey<NavigatorState>();
+
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     String? screen;
@@ -40,11 +42,11 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       initialRoute: '/',
       routes: {
-        '/': (context) => MySplashScreen(),
-        '/main_screen': (context) => MainScreen(),
+        '/': (context) => const MySplashScreen(),
+        '/main_screen': (context) => const MainScreen(),
         '/login_screen': (context) => const Login(),
         '/register_screen': (context) => const Register(),
-        '/car_info_screen': (context) => CarInfoScreen(),
+        '/car_info_screen': (context) => const CarInfoScreen(),
         '/new_trip_screen': (context) => NewTripScreen(),
       },
       debugShowCheckedModeBanner: false,

@@ -13,9 +13,10 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:logitrust_drivers/widgets/push_notification_dialog.dart';
 
 class HomeTabPage extends StatefulWidget {
-  const HomeTabPage({Key? key}) : super(key: key);
+  const HomeTabPage({super.key});
 
   @override
   _HomeTabPageState createState() => _HomeTabPageState();
@@ -41,6 +42,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     }
   }
 
+  
+
   // Get Current Location of the driver
   locateDriverPosition() async {
     driverCurrentPosition = await Geolocator.getCurrentPosition(
@@ -57,7 +60,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     String humanReadableAddress =
         await AssistantMethods.searchAddressForGeographicCoordinates(
             driverCurrentPosition!, context);
-    print("this is your address = " + humanReadableAddress);
+    print("this is your address = $humanReadableAddress");
   }
 
   // Enable Push Notifications
@@ -89,9 +92,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     AssistantMethods.getLastTripInformation(context);
 
     //currentFirebaseUser = firebaseAuth.currentUser;
-    PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
-    pushNotificationSystem.initializeCloudMessaging(context);
-    pushNotificationSystem.generateRegistrationToken();
+    
+    
 
     // Get Driver Ratings
     AssistantMethods.getDriverRating(context);
@@ -103,6 +105,26 @@ class _HomeTabPageState extends State<HomeTabPage> {
     checkIfLocationPermissionAllowed();
     readCurrentDriverInformation();
     AssistantMethods.readRideRequestKeys(context);
+    _rideRequestsRef = FirebaseDatabase.instance.ref().child("AllRideRequests");
+
+     _rideRequestsRef.onChildAdded.listen((DatabaseEvent event) {
+      final rideRequestId = event.snapshot.key;
+      if (rideRequestId != null) {
+        _showRideRequestDialog(rideRequestId);
+      }
+    });
+  }
+   late DatabaseReference _rideRequestsRef;
+
+ 
+
+  void _showRideRequestDialog(String rideRequestId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return RideRequestDialog(rideRequestId: rideRequestId,);
+      },
+    );
   }
 
   @override

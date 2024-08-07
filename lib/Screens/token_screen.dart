@@ -2,6 +2,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class TokenScreen extends StatefulWidget {
+  const TokenScreen({super.key});
+
   @override
   _TokenScreenState createState() => _TokenScreenState();
 }
@@ -45,26 +47,26 @@ class _TokenScreenState extends State<TokenScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('FCM Device Token'),
+        title: const Text('FCM Device Token'),
       ),
       body: Center(
         child: _isLoading
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : _deviceToken != null
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('Device Token: $_deviceToken'),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _getDeviceToken,
-                        child: Text('Refresh Token'),
+                        child: const Text('Refresh Token'),
                       ),
                     ],
                   )
                 : _error != null
                     ? Text(_error!)
-                    : Text('No token available.'),
+                    : const Text('No token available.'),
       ),
     );
   }

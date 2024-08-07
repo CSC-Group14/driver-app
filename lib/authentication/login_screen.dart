@@ -8,7 +8,7 @@ import '../global/global.dart';
 import '../widgets/progress_dialog.dart';
 
 class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -41,6 +41,7 @@ class _LoginState extends State<Login> {
       email: emailTextEditingController.text.trim(),
       password: passwordTextEditingController.text.trim(),
     )
+            // ignore: body_might_complete_normally_catch_error
             .catchError((message) {
       Navigator.pop(context);
       Fluttertoast.showToast(msg: "Error: $message");
@@ -104,7 +105,7 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       labelText: "Email",
                       hintText: "Email",
-                      prefixIcon: Icon(Icons.email),
+                      prefixIcon: const Icon(Icons.email),
                       suffixIcon: emailTextEditingController.text.isEmpty
                           ? Container(width: 0)
                           : IconButton(
@@ -141,7 +142,7 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       labelText: "Password",
                       hintText: "Password",
-                      prefixIcon: Icon(Icons.password),
+                      prefixIcon: const Icon(Icons.password),
                       suffixIcon: IconButton(
                         icon: isPasswordVisible
                             ? const Icon(Icons.visibility_off)
@@ -166,8 +167,9 @@ class _LoginState extends State<Login> {
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "The field is empty";
-                      } else
+                      } else {
                         return null;
+                      }
                     },
                   ),
                   const SizedBox(height: 20),

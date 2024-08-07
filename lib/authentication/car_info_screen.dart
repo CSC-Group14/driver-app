@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class CarInfoScreen extends StatefulWidget {
+  const CarInfoScreen({super.key});
+
   @override
   _CarInfoScreenState createState() => _CarInfoScreenState();
 }
@@ -139,9 +141,9 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 },
                 items: carTypesList.map((car) {
                   return DropdownMenuItem<String>(
+                    value: car,
                     child:
                         Text(car, style: const TextStyle(color: Colors.black)),
-                    value: car,
                   );
                 }).toList(),
               ),

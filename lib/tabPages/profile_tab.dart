@@ -1,11 +1,9 @@
-import 'package:logitrust_drivers/InfoHandler/app_info.dart';
 import 'package:logitrust_drivers/global/global.dart';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class ProfileTabPage extends StatefulWidget {
-  const ProfileTabPage({Key? key}) : super(key: key);
+  const ProfileTabPage({super.key});
 
   @override
   _ProfileTabPageState createState() => _ProfileTabPageState();
@@ -29,7 +27,7 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
               ),
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -53,7 +51,7 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
                         ),
                       ),
 
-                      Center(),
+                      const Center(),
 
                       const SizedBox(
                         height: 40,
@@ -99,7 +97,7 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
                         thickness: 1,
                       ),
 
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
 
@@ -131,11 +129,11 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
                               ),
                             ],
                           ),
-                          Icon(Icons.arrow_forward_ios),
+                          const Icon(Icons.arrow_forward_ios),
                         ],
                       ),
 
-                      SizedBox(
+                      const SizedBox(
                         height: 2,
                       ),
 
@@ -174,11 +172,11 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
                               ),
                             ],
                           ),
-                          Icon(Icons.arrow_forward_ios),
+                          const Icon(Icons.arrow_forward_ios),
                         ],
                       ),
 
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
 
@@ -186,7 +184,7 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
                         thickness: 1,
                       ),
 
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                     ],
@@ -207,7 +205,7 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
                     width: 2,
                     color: Colors.white,
                   )),
-              child: Icon(Icons.person),
+              child: const Icon(Icons.person),
             ),
           ),
         ],

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:logitrust_drivers/models/driver_data.dart';

@@ -5,6 +5,7 @@ class UserModel{
   String? name;
   String? email;
   String? phone;
+  String? tripDirectionDetailsInfo;
 
   UserModel({this.id,this.name,this.email,this.phone});
 
@@ -13,6 +14,7 @@ class UserModel{
     name = (snapshot.value as dynamic)["name"];
     email = (snapshot.value as dynamic)["email"];
     phone = (snapshot.value as dynamic)["phone"];
+
   }
 
 }

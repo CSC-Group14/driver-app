@@ -7,6 +7,8 @@ import 'package:logitrust_drivers/models/riderequest.dart';
 // Import the NewTripScreen
 
 class NotificationPage extends StatefulWidget {
+  const NotificationPage({super.key});
+
   @override
   _NotificationPageState createState() => _NotificationPageState();
 }
@@ -26,17 +28,17 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Ride Requests')),
+      appBar: AppBar(title: const Text('Ride Requests')),
       body: StreamBuilder<DatabaseEvent>(
         stream: _rideRequestsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData ||
               snapshot.data!.snapshot.value == null) {
-            return Center(child: Text('No ride requests available.'));
+            return const Center(child: Text('No ride requests available.'));
           } else {
             // Parse ride requests
             final data = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
@@ -49,6 +51,8 @@ class _NotificationPageState extends State<NotificationPage> {
                 time: request['time'] ?? '',
                 userName: request['userName'] ?? '',
                 userPhone: request['userPhone'] ?? '',
+                status: request['status'] ?? '',
+                
               );
             }).toList();
 
@@ -57,9 +61,9 @@ class _NotificationPageState extends State<NotificationPage> {
               itemBuilder: (context, index) {
                 final request = rideRequests[index];
                 return Card(
-                  margin: EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(8),
                   child: ListTile(
-                    contentPadding: EdgeInsets.all(16),
+                    contentPadding: const EdgeInsets.all(16),
                     title: Text(request.userName),
                     subtitle: Text(
                         'From: ${request.sourceAddress}\nTo: ${request.destinationAddress}\nTime: ${request.time}'),
@@ -67,11 +71,11 @@ class _NotificationPageState extends State<NotificationPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.check, color: Colors.green),
+                          icon: const Icon(Icons.check, color: Colors.green),
                           onPressed: () => _acceptRide(request),
                         ),
                         IconButton(
-                          icon: Icon(Icons.close, color: Colors.red),
+                          icon: const Icon(Icons.close, color: Colors.red),
                           onPressed: () {
                             // Handle reject action
                             print('Rejected: ${request.id}');

@@ -2,6 +2,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class TokenScreen extends StatefulWidget {
+  const TokenScreen({super.key});
+
   @override
   _TokenScreenState createState() => _TokenScreenState();
 }
@@ -61,12 +63,12 @@ class _TokenScreenState extends State<TokenScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('FCM Device Token'),
+        title: const Text('FCM Device Token'),
       ),
       body: Center(
         child: _deviceToken == null
-            ? CircularProgressIndicator()
-            : Text('Device Token fetched. Check console for details.'),
+            ? const CircularProgressIndicator()
+            : const Text('Device Token fetched. Check console for details.'),
       ),
     );
   }

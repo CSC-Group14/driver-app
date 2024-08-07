@@ -51,6 +51,74 @@ class _NewTripScreenState extends State<NewTripScreen> {
   String durationFromSourceToDestination = "";
   bool isRequestDirectionDetails = false;
 
+    @override
+  void initState() {
+    super.initState();
+    saveAssignedDriverDetailsToRideRequest();
+    fetchSourceAndDestination(); 
+    saveAssignedDriverDetailsToRideRequest();// Fetch source and destination locations
+  }
+
+
+  Future<void> fetchSourceAndDestination() async {
+  if (widget.rideRequest == null) return;
+
+  DatabaseReference rideRequestRef = FirebaseDatabase.instance
+      .ref()
+      .child("AllRideRequests")
+      .child(widget.rideRequest!.id);
+
+  // Fetch source and destination as DatabaseEvent
+  DatabaseEvent sourceEvent = await rideRequestRef.child("source").once();
+  DatabaseEvent destinationEvent = await rideRequestRef.child("destination").once();
+
+  // Access DataSnapshot from DatabaseEvent
+  DataSnapshot sourceSnapshot = sourceEvent.snapshot;
+  DataSnapshot destinationSnapshot = destinationEvent.snapshot;
+
+  if (sourceSnapshot.exists && destinationSnapshot.exists) {
+    var sourceData = sourceSnapshot.value as Map?;
+    var destinationData = destinationSnapshot.value as Map?;
+
+    if (sourceData != null && destinationData != null) {
+      double sourceLat = double.parse(sourceData['latitude'].toString());
+      double sourceLng = double.parse(sourceData['longitude'].toString());
+      double destinationLat = double.parse(destinationData['latitude'].toString());
+      double destinationLng = double.parse(destinationData['longitude'].toString());
+
+      LatLng sourceLatLng = LatLng(sourceLat, sourceLng);
+      LatLng destinationLatLng = LatLng(destinationLat, destinationLng);
+
+      setState(() {
+        // Add markers for source and destination
+        setOfMarkers.add(
+          Marker(
+            markerId: const MarkerId("sourceID"),
+            position: sourceLatLng,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+            infoWindow: const InfoWindow(title: "Source"),
+          ),
+        );
+        setOfMarkers.add(
+          Marker(
+            markerId: const MarkerId("destinationID"),
+            position: destinationLatLng,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            infoWindow: const InfoWindow(title: "Destination"),
+          ),
+        );
+        
+        
+        // Draw the polyline
+        drawPolylineFromSourceToDestination(sourceLatLng, destinationLatLng);
+      });
+    }
+  } else {
+    Fluttertoast.showToast(msg: "Source or destination data not found.");
+  }
+}
+
+
   Future<void> drawPolylineFromSourceToDestination(
       LatLng source, LatLng destination) async {
     if (source == null || destination == null) return;
@@ -160,6 +228,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     });
   }
 
+
   Future<void> endTrip() async {
     showDialog(
       context: context,
@@ -258,11 +327,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
   }
 
 
-  @override
-  void initState() {
-    super.initState();
-    saveAssignedDriverDetailsToRideRequest();
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -286,6 +351,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
               setState(() {
                 mapPadding = 320;
+                
               });
 
               if (driverCurrentPosition != null && widget.rideRequest != null) {
@@ -301,19 +367,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
                 if (source != null) {
                   // Check if source is a LatLng object or Map
                   LatLng sourceLatLng;
-                  if (source is LatLng) {
-                    sourceLatLng = source;
-                  } else if (source is Map<String, dynamic>) {
-                    // Convert Map to LatLng
-                    sourceLatLng = sourceLatLng =
-                        LatLng(source.latitude, source.longitude);
-                  } else {
-                    // Invalid format
-                    Fluttertoast.showToast(
-                        msg: "Invalid source location format.");
-                    return;
-                  }
-
+                  sourceLatLng = source;
+                
                   drawPolylineFromSourceToDestination(
                       driverCurrentLatLng, sourceLatLng);
                 } else {
@@ -378,17 +433,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                             color: Colors.black,
                           ),
                         ),
-                        // IconButton(
-                        //   icon: Icon(Icons.call, color: Colors.green),
-                        //   onPressed: () {
-                        //     // Check if the phone number is available
-                        //     if (widget.rideRequest?.userPhone != null) {
-                        //       _makePhoneCall(widget.rideRequest!.userPhone);
-                        //     } else {
-                        //       Fluttertoast.showToast(msg: "Phone number not available.");
-                        //     }
-                        //   },
-                        // ),
+                        
                       ],
                     ),
                     const SizedBox(
@@ -587,7 +632,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     if (driverIconMarker == null) {
       ImageConfiguration imageConfiguration =
           createLocalImageConfiguration(context, size: const Size(2, 2));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, "images/truck-2.png")
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "images/car-2.png")
           .then((value) {
         driverIconMarker = value;
       });
@@ -595,7 +640,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
   }
 
   updateDriversLocationAtRealTime() {
-    Fluttertoast.showToast(msg: "Inside updateDriversLocationAtRealTime()");
+    
     streamSubscriptionPosition =
         Geolocator.getPositionStream().listen((Position position) {
       driverCurrentPosition = position;
@@ -643,7 +688,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
   }
 
   updateDurationAtRealTime() async {
-    Fluttertoast.showToast(msg: "Inside updateDurationAtRealTime()");
+    
     if (!isRequestDirectionDetails) {
       isRequestDirectionDetails = true;
 

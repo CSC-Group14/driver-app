@@ -7,7 +7,7 @@ import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 import '../InfoHandler/app_info.dart';
 
 class RatingsTabPage extends StatefulWidget {
-  const RatingsTabPage({Key? key}) : super(key: key);
+  const RatingsTabPage({super.key});
 
   @override
   _RatingsTabPageState createState() => _RatingsTabPageState();
@@ -75,7 +75,7 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
             Navigator.pushReplacementNamed(context, "/main_screen");
           },
           style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back_outlined,
             color: Colors.redAccent,
           ),
@@ -103,10 +103,10 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
 
               CircleAvatar(
                 backgroundColor: Colors.white,
+                radius: 60,
                 child: Image.asset(
                   "images/Passport_Photo.jpg",
                 ),
-                radius: 60,
               ),
 
               const SizedBox(
@@ -116,7 +116,7 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
               // Driver Name
               Text(
                 driverData.name!,
-                style: TextStyle(
+                style: const TextStyle(
                     color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.bold),
@@ -154,7 +154,7 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
                 height: 10.0,
               ),
 
-              Text("Rating: " + driverRating.toString(),
+              Text("Rating: $driverRating",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -164,7 +164,7 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
               const SizedBox(height: 10.0),
 
               Text(
-                "Driver Type: " + titleStarRating,
+                "Driver Type: $titleStarRating",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

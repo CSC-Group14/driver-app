@@ -5,7 +5,7 @@ class FareAmountDialog extends StatefulWidget {
   double? fareAmount;
   String? userName;
 
-  FareAmountDialog({this.fareAmount, this.userName});
+  FareAmountDialog({super.key, this.fareAmount, this.userName});
 
   @override
   State<FareAmountDialog> createState() => _FareAmountDialogState();
@@ -16,12 +16,12 @@ class _FareAmountDialogState extends State<FareAmountDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      backgroundColor: Color.fromRGBO(0, 177, 118, 1),
+      backgroundColor: const Color.fromRGBO(0, 177, 118, 1),
       child: Container(
-        margin: EdgeInsets.all(6),
+        margin: const EdgeInsets.all(6),
         width: double.infinity,
         decoration: BoxDecoration(
-            color: Color.fromRGBO(0, 177, 118, 1),
+            color: const Color.fromRGBO(0, 177, 118, 1),
             borderRadius: BorderRadius.circular(6)),
         child: Padding(
           padding: const EdgeInsets.all(15.0),

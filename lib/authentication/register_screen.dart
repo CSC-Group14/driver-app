@@ -8,7 +8,7 @@ import '../global/global.dart';
 import '../widgets/progress_dialog.dart';
 
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  const Register({super.key});
 
   @override
   State<Register> createState() => _RegisterState();
@@ -132,8 +132,9 @@ class _RegisterState extends State<Register> {
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "The field is empty";
-                      } else
+                      } else {
                         return null;
+                      }
                     },
                   ),
                   const SizedBox(height: 20),
@@ -202,8 +203,9 @@ class _RegisterState extends State<Register> {
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "The field is empty";
-                      } else
+                      } else {
                         return null;
+                      }
                     },
                   ),
                   const SizedBox(height: 20),
@@ -240,8 +242,9 @@ class _RegisterState extends State<Register> {
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "The field is empty";
-                      } else
+                      } else {
                         return null;
+                      }
                     },
                   ),
                   const SizedBox(height: 20),

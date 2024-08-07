@@ -5,20 +5,24 @@ import 'package:logitrust_drivers/global/global.dart';
 import 'package:logitrust_drivers/models/riderequest.dart';
 import 'package:logitrust_drivers/widgets/fare_amount_collection_dialog.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../assistants/assistant_methods.dart';
-import '../models/ride_request_information.dart';
 import '../widgets/progress_dialog.dart';
+
+const CameraPosition googlePlexInitialPosition = CameraPosition(
+  target: LatLng(0.3476, 32.5825), // Kampala, Uganda
+  zoom: 14.4746,
+);
 
 class NewTripScreen extends StatefulWidget {
   final RideRequest? rideRequest;
 
-  NewTripScreen({this.rideRequest});
+  const NewTripScreen({super.key, this.rideRequest});
 
   @override
   State<NewTripScreen> createState() => _NewTripScreenState();
@@ -32,9 +36,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
     zoom: 14.4746,
   );
 
-  Set<Marker> setOfMarkers = Set<Marker>();
-  Set<Circle> setOfCircles = Set<Circle>();
-  Set<Polyline> polyLineSet = Set<Polyline>();
+  Set<Marker> setOfMarkers = <Marker>{};
+  Set<Circle> setOfCircles = <Circle>{};
+  Set<Polyline> polyLineSet = <Polyline>{};
   List<LatLng> polyLineCoordinatesList = [];
   PolylinePoints polylinePoints = PolylinePoints();
   double mapPadding = 0;
@@ -70,10 +74,10 @@ class _NewTripScreenState extends State<NewTripScreen> {
     polyLineCoordinatesList.clear();
 
     if (decodedPolyLinePointsList.isNotEmpty) {
-      decodedPolyLinePointsList.forEach((PointLatLng pointLatLng) {
+      for (var pointLatLng in decodedPolyLinePointsList) {
         polyLineCoordinatesList
             .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
-      });
+      }
     }
 
     polyLineSet.clear();
@@ -119,13 +123,13 @@ class _NewTripScreenState extends State<NewTripScreen> {
         markerId: const MarkerId("sourceID"),
         position: source,
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        infoWindow: InfoWindow(title: "Source"));
+        infoWindow: const InfoWindow(title: "Source"));
 
     Marker destinationMarker = Marker(
         markerId: const MarkerId("destinationID"),
         position: destination,
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        infoWindow: InfoWindow(title: "Destination"));
+        infoWindow: const InfoWindow(title: "Destination"));
 
     setState(() {
       setOfMarkers.add(originMarker);
@@ -177,10 +181,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     if (tripDirectionDetailsInfo == null) return;
 
     Fluttertoast.showToast(
-        msg: "KM:" +
-            tripDirectionDetailsInfo.duration_text! +
-            " Time:" +
-            tripDirectionDetailsInfo.distance_text!);
+        msg: "KM:${tripDirectionDetailsInfo.duration_text!} Time:${tripDirectionDetailsInfo.distance_text!}");
 
     double? fareAmount =
         AssistantMethods.calculateFareAmountFromSourceToDestination(
@@ -240,6 +241,22 @@ class _NewTripScreenState extends State<NewTripScreen> {
       }
     });
   }
+
+  Future<String?> getPhoneNumberFromFirebase() async {
+    DatabaseReference reference = FirebaseDatabase.instance
+    .ref()
+    .child('Users')
+    .child(currentFirebaseUser!.uid)
+    .child("phone");
+    
+    DataSnapshot snapshot = (await reference.once()) as DataSnapshot;
+    
+    if (snapshot.exists) {
+      return snapshot.value.toString();
+    }
+    return null;
+  }
+
 
   @override
   void initState() {
@@ -324,7 +341,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                 ],
               ),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
                 child: Column(
                   children: [
                     Text(
@@ -361,6 +378,17 @@ class _NewTripScreenState extends State<NewTripScreen> {
                             color: Colors.black,
                           ),
                         ),
+                        // IconButton(
+                        //   icon: Icon(Icons.call, color: Colors.green),
+                        //   onPressed: () {
+                        //     // Check if the phone number is available
+                        //     if (widget.rideRequest?.userPhone != null) {
+                        //       _makePhoneCall(widget.rideRequest!.userPhone);
+                        //     } else {
+                        //       Fluttertoast.showToast(msg: "Phone number not available.");
+                        //     }
+                        //   },
+                        // ),
                       ],
                     ),
                     const SizedBox(
@@ -411,6 +439,25 @@ class _NewTripScreenState extends State<NewTripScreen> {
                               ),
                             ),
                           ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            if (widget.rideRequest?.userPhone != null) {
+                              _makePhoneCall(widget.rideRequest!.userPhone!);
+                            } else {
+                              Fluttertoast.showToast(msg: "Phone number not available.");
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromARGB(255, 249, 247, 245), // Set button color
+                            padding: const EdgeInsets.all(5.0),
+                            textStyle: const TextStyle(color: Colors.white),
+                          ),
+                          child: const Text('Call'),
                         ),
                       ],
                     ),
@@ -566,7 +613,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
             markerId: const MarkerId("animatingCarMarker"),
             position: driverLivePositionLatLng,
             icon: driverIconMarker!,
-            infoWindow: InfoWindow(title: "Your Location"));
+            infoWindow: const InfoWindow(title: "Your Location"));
 
         setState(() {
           CameraPosition cameraPosition =
@@ -623,4 +670,17 @@ class _NewTripScreenState extends State<NewTripScreen> {
       }
     }
   }
+
 }
+void _makePhoneCall(String phoneNumber) async {
+  final Uri launchUri = Uri(
+    scheme: 'tel',
+    path: phoneNumber,
+  );
+  if (await canLaunchUrl(launchUri)) {
+    await launchUrl(launchUri);
+  } else {
+    Fluttertoast.showToast(msg: "Could not place the call.");
+  }
+}
+

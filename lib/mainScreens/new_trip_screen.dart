@@ -715,17 +715,18 @@ class _NewTripScreenState extends State<NewTripScreen> {
       }
     }
   }
+  void _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
+    } else {
+      Fluttertoast.showToast(msg: "Could not place the call.");
+    }
+  }
 
 }
-void _makePhoneCall(String phoneNumber) async {
-  final Uri launchUri = Uri(
-    scheme: 'tel',
-    path: phoneNumber,
-  );
-  if (await canLaunchUrl(launchUri)) {
-    await launchUrl(launchUri);
-  } else {
-    Fluttertoast.showToast(msg: "Could not place the call.");
-  }
-}
+
 

@@ -64,7 +64,7 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
               const SizedBox(height: 24),
               Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Image.asset("images/logoo.png"),
+                child: Image.asset("images/logitrust.png"),
               ),
               const SizedBox(height: 10),
               const Text(

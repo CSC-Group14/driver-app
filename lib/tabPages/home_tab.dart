@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:logitrust_drivers/assistants/assistant_methods.dart';
 import 'package:logitrust_drivers/global/global.dart';
 
-import 'package:logitrust_drivers/push_notifications/push_notifications_system.dart';
-
 import 'package:firebase_database/firebase_database.dart';
 
 import 'package:flutter/material.dart';
@@ -41,8 +39,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
       _locationPermission = await Geolocator.requestPermission();
     }
   }
-
-  
 
   // Get Current Location of the driver
   locateDriverPosition() async {
@@ -92,8 +88,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
     AssistantMethods.getLastTripInformation(context);
 
     //currentFirebaseUser = firebaseAuth.currentUser;
-    
-    
 
     // Get Driver Ratings
     AssistantMethods.getDriverRating(context);
@@ -107,22 +101,23 @@ class _HomeTabPageState extends State<HomeTabPage> {
     AssistantMethods.readRideRequestKeys(context);
     _rideRequestsRef = FirebaseDatabase.instance.ref().child("AllRideRequests");
 
-     _rideRequestsRef.onChildAdded.listen((DatabaseEvent event) {
+    _rideRequestsRef.onChildAdded.listen((DatabaseEvent event) {
       final rideRequestId = event.snapshot.key;
       if (rideRequestId != null) {
         _showRideRequestDialog(rideRequestId);
       }
     });
   }
-   late DatabaseReference _rideRequestsRef;
 
- 
+  late DatabaseReference _rideRequestsRef;
 
   void _showRideRequestDialog(String rideRequestId) {
     showDialog(
       context: context,
       builder: (context) {
-        return RideRequestDialog(rideRequestId: rideRequestId,);
+        return RideRequestDialog(
+          rideRequestId: rideRequestId,
+        );
       },
     );
   }

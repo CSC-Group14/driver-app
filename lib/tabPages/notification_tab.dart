@@ -39,6 +39,7 @@ class _NotificationPageState extends State<NotificationPage> {
             // Parse ride requests
             final data = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
 
+
             // Ensure data is in the expected format and filter out empty requests
             final rideRequests = data.entries
                 .map((entry) {
@@ -73,6 +74,8 @@ class _NotificationPageState extends State<NotificationPage> {
                 })
                 .whereType<RideRequest>()
                 .toList();
+          
+
 
             return ListView.builder(
               itemCount: rideRequests.length,

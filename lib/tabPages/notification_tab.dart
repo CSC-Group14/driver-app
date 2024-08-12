@@ -39,28 +39,42 @@ class _NotificationPageState extends State<NotificationPage> {
           } else {
             // Parse ride requests
             final data = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
-            
-            // Ensure data is in the expected format
-            final rideRequests = data.entries.map((entry) {
-              final request = entry.value;
-              
-              // Check if the request is a Map
-              if (request is Map<dynamic, dynamic>) {
-                return RideRequest(
-                  id: entry.key.toString(),
-                  destinationAddress: request['destinationAddress'] ?? '',
-                  sourceAddress: request['sourceAddress'] ?? '',
-                  time: request['time'] ?? '',
-                  userName: request['userName'] ?? '',
-                  userPhone: request['userPhone'] ?? '',
-                  status: request['status'] ?? '',
-                );
-              } else {
-                // Handle unexpected data format
-                print('Unexpected data format: $request');
-                return null; // or return a default value
-              }
-            }).whereType<RideRequest>().toList();
+
+            // Ensure data is in the expected format and filter out empty requests
+            final rideRequests = data.entries
+                .map((entry) {
+                  final request = entry.value;
+
+                  // Check if the request is a Map
+                  if (request is Map<dynamic, dynamic>) {
+                    // Create a RideRequest instance and validate required fields
+                    final rideRequest = RideRequest(
+                      id: entry.key.toString(),
+                      destinationAddress: request['destinationAddress'] ?? '',
+                      sourceAddress: request['sourceAddress'] ?? '',
+                      time: request['time'] ?? '',
+                      userName: request['userName'] ?? '',
+                      userPhone: request['userPhone'] ?? '',
+                      status: request['status'] ?? '',
+                    );
+
+                    // Return the rideRequest if it has all required fields
+                    if (rideRequest.destinationAddress.isNotEmpty &&
+                        rideRequest.sourceAddress.isNotEmpty &&
+                        rideRequest.time.isNotEmpty &&
+                        rideRequest.userName.isNotEmpty &&
+                        rideRequest.userPhone.isNotEmpty) {
+                      return rideRequest;
+                    }
+                  }
+
+                  // Handle unexpected data format or empty request
+                  print('Invalid or empty ride request: $entry');
+                  return null; // or return a default value
+                })
+                .whereType<RideRequest>()
+                .where((request) => request.status != 'Accepted')
+                .toList();
 
             return ListView.builder(
               itemCount: rideRequests.length,

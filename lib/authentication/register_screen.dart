@@ -94,7 +94,7 @@ class _RegisterState extends State<Register> {
               padding: const EdgeInsets.all(25.0),
               child: Column(
                 children: [
-                  Image.asset("images/logoo.png"),
+                  Image.asset("images/logitrust.png"),
                   const Text(
                     "Register as a Driver",
                     style: TextStyle(

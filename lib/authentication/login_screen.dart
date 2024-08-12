@@ -89,7 +89,7 @@ class _LoginState extends State<Login> {
               padding: const EdgeInsets.all(25.0),
               child: Column(
                 children: [
-                  Image.asset("images/Trippo Logo.png"),
+                  Image.asset("images/logitrust.png"),
                   const Text(
                     "Login as a Driver",
                     style: TextStyle(

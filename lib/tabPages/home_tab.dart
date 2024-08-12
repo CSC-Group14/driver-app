@@ -2,11 +2,8 @@ import 'dart:async';
 
 import 'package:logitrust_drivers/assistants/assistant_methods.dart';
 import 'package:logitrust_drivers/global/global.dart';
-
 import 'package:firebase_database/firebase_database.dart';
-
 import 'package:flutter/material.dart';
-
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
@@ -32,6 +29,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
   var geoLocator = Geolocator();
   LocationPermission? _locationPermission;
 
+  // Set to track processed ride request IDs
+  Set<String> processedRideRequestIds = {};
+
   checkIfLocationPermissionAllowed() async {
     _locationPermission = await Geolocator.requestPermission();
 
@@ -52,7 +52,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
     newMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
-    //userName = currentUserInfo!.name!;
     String humanReadableAddress =
         await AssistantMethods.searchAddressForGeographicCoordinates(
             driverCurrentPosition!, context);
@@ -86,10 +85,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
     });
 
     AssistantMethods.getLastTripInformation(context);
-
-    //currentFirebaseUser = firebaseAuth.currentUser;
-
-    // Get Driver Ratings
     AssistantMethods.getDriverRating(context);
   }
 
@@ -101,10 +96,24 @@ class _HomeTabPageState extends State<HomeTabPage> {
     AssistantMethods.readRideRequestKeys(context);
     _rideRequestsRef = FirebaseDatabase.instance.ref().child("AllRideRequests");
 
-    _rideRequestsRef.onChildAdded.listen((DatabaseEvent event) {
+    _rideRequestsRef.onChildAdded.listen((DatabaseEvent event) async {
       final rideRequestId = event.snapshot.key;
-      if (rideRequestId != null) {
-        _showRideRequestDialog(rideRequestId);
+      if (rideRequestId != null && !processedRideRequestIds.contains(rideRequestId)) {
+        // Fetch ride request details
+        DatabaseReference rideRequestRef = FirebaseDatabase.instance
+            .ref()
+            .child("AllRideRequests")
+            .child(rideRequestId);
+
+        // Using event.snapshot to access the data
+        final snapshot = await rideRequestRef.once();
+        final rideRequestData = snapshot.snapshot.value as Map?;
+        final rideRequestStatus = rideRequestData?['status'] ?? '';
+
+        if (rideRequestStatus != 'Accepted') {
+          _showRideRequestDialog(rideRequestId);
+          processedRideRequestIds.add(rideRequestId); // Add to processed IDs
+        }
       }
     });
   }
@@ -210,7 +219,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
         desiredAccuracy: LocationAccuracy.high);
 
     Geofire.initialize(
-        "ActiveDrivers"); // Setting up a new node in realtime database
+        "ActiveDrivers");
     Geofire.setLocation(currentFirebaseUser!.uid,
         driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
 
@@ -226,7 +235,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   driverIsOfflineNow() async {
     Geofire.removeLocation(currentFirebaseUser!
-        .uid); // ActiveDrivers child with this id deleted from Realtime Firebase
+        .uid);
 
     DatabaseReference? reference = FirebaseDatabase.instance
         .ref()
@@ -241,12 +250,12 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   updateDriversLocationAtRealTime() {
     streamSubscriptionPosition =
-        Geolocator.getPositionStream() // Get Updated position of the driver
+        Geolocator.getPositionStream()
             .listen((Position position) {
       driverCurrentPosition = position;
 
       if (isDriverActive == true) {
-        Geofire.setLocation // Updating live location in realtime database
+        Geofire.setLocation
             (currentFirebaseUser!.uid, driverCurrentPosition!.latitude,
                 driverCurrentPosition!.longitude);
       }
@@ -257,7 +266,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
       );
 
       newMapController!.animateCamera(CameraUpdate.newLatLng(
-          latLng)); // Animating camera in google map according to LatLng
+          latLng));
     });
   }
 }

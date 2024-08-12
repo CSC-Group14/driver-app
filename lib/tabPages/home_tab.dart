@@ -98,7 +98,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
     _rideRequestsRef.onChildAdded.listen((DatabaseEvent event) async {
       final rideRequestId = event.snapshot.key;
-      if (rideRequestId != null && !processedRideRequestIds.contains(rideRequestId)) {
+      if (rideRequestId != null &&
+          !processedRideRequestIds.contains(rideRequestId)) {
         // Fetch ride request details
         DatabaseReference rideRequestRef = FirebaseDatabase.instance
             .ref()
@@ -108,9 +109,15 @@ class _HomeTabPageState extends State<HomeTabPage> {
         // Using event.snapshot to access the data
         final snapshot = await rideRequestRef.once();
         final rideRequestData = snapshot.snapshot.value as Map?;
+
+        // Check for null source and destination IDs
+        final sourceId = rideRequestData?['source'];
+        final destinationId = rideRequestData?['destination'];
         final rideRequestStatus = rideRequestData?['status'] ?? '';
 
-        if (rideRequestStatus != 'Accepted') {
+        if (sourceId != null &&
+            destinationId != null &&
+            rideRequestStatus != 'Accepted') {
           _showRideRequestDialog(rideRequestId);
           processedRideRequestIds.add(rideRequestId); // Add to processed IDs
         }
@@ -218,8 +225,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     driverCurrentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
-    Geofire.initialize(
-        "ActiveDrivers");
+    Geofire.initialize("ActiveDrivers");
     Geofire.setLocation(currentFirebaseUser!.uid,
         driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
 
@@ -234,8 +240,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
   }
 
   driverIsOfflineNow() async {
-    Geofire.removeLocation(currentFirebaseUser!
-        .uid);
+    Geofire.removeLocation(currentFirebaseUser!.uid);
 
     DatabaseReference? reference = FirebaseDatabase.instance
         .ref()
@@ -250,14 +255,12 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   updateDriversLocationAtRealTime() {
     streamSubscriptionPosition =
-        Geolocator.getPositionStream()
-            .listen((Position position) {
+        Geolocator.getPositionStream().listen((Position position) {
       driverCurrentPosition = position;
 
       if (isDriverActive == true) {
-        Geofire.setLocation
-            (currentFirebaseUser!.uid, driverCurrentPosition!.latitude,
-                driverCurrentPosition!.longitude);
+        Geofire.setLocation(currentFirebaseUser!.uid,
+            driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
       }
 
       LatLng latLng = LatLng(
@@ -265,8 +268,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
         driverCurrentPosition!.longitude,
       );
 
-      newMapController!.animateCamera(CameraUpdate.newLatLng(
-          latLng));
+      newMapController!.animateCamera(CameraUpdate.newLatLng(latLng));
     });
   }
 }

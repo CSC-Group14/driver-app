@@ -35,7 +35,7 @@ class _MainScreenState extends State<MainScreen>
       body: TabBarView(
         physics: const NeverScrollableScrollPhysics(),
         controller: tabController,
-        children:  const [
+        children: const [
           HomeTabPage(),
           NotificationPage(),
           NewTripScreen(),
@@ -50,7 +50,7 @@ class _MainScreenState extends State<MainScreen>
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notification_add),
-            label: "Ride Requests",
+            label: "Ride Status",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.card_travel),

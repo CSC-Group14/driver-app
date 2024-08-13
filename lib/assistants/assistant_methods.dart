@@ -100,29 +100,32 @@ class AssistantMethods {
 
   static double calculateFareAmountFromSourceToDestination(
       DirectionDetailsInfo directionDetailsInfo, String? vehicleType) {
-    double baseFare, FareAmountPerMinute, FareAmountPerKilometer;
+    double baseFare, fareAmountPerMinute, fareAmountPerKilometer;
+
     if (vehicleType == "large") {
-      baseFare = 300000;
-      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 300;
-      FareAmountPerKilometer =
+      baseFare = 3000;
+      fareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 300;
+      fareAmountPerKilometer =
           (directionDetailsInfo.distance_value! / 1000) * 2000;
     } else if (vehicleType == "medium") {
-      baseFare = 500000;
-      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 400;
-      FareAmountPerKilometer =
+      baseFare = 5000;
+      fareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 400;
+      fareAmountPerKilometer =
           (directionDetailsInfo.distance_value! / 1000) * 2500;
     } else {
-      baseFare = 100000;
-      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 100;
-      FareAmountPerKilometer =
+      baseFare = 2000;
+      fareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 100;
+      fareAmountPerKilometer =
           (directionDetailsInfo.distance_value! / 1000) * 1000;
     }
 
-    //In taka
     double totalFareAmount =
-        baseFare + FareAmountPerMinute + FareAmountPerKilometer;
+        baseFare + fareAmountPerMinute + fareAmountPerKilometer;
 
-    return double.parse(totalFareAmount.toStringAsFixed(1));
+    // Round to the nearest 1000 UGX
+    totalFareAmount = (totalFareAmount / 1000).round() * 1000;
+
+    return totalFareAmount;
   }
 
   // For Trip history
@@ -173,7 +176,7 @@ class AssistantMethods {
         var eachTripHistoryInformation =
             TripHistoryModel.fromSnapshot(snapData.snapshot);
 
-        if ((snapData.snapshot.value as Map)["driverStatus"] == "Ended") {
+        if ((snapData.snapshot.value as Map)["status"] == "Ended") {
           // Add each TripHistoryModel to a  historyInformationList in AppInfo class
           Provider.of<AppInfo>(context, listen: false)
               .updateTotalHistoryInformation(eachTripHistoryInformation);
@@ -191,7 +194,7 @@ class AssistantMethods {
         .then((snapData) async {
       var lastTripHistoryInformation =
           TripHistoryModel.fromSnapshot(snapData.snapshot);
-      if ((snapData.snapshot.value as Map)["driverStatus"] == "Ended") {
+      if ((snapData.snapshot.value as Map)["status"] == "Ended") {
         // Add each TripHistoryModel to a  historyInformationList in AppInfo class
 
         LatLng lastTripSourceLatLng = LatLng(

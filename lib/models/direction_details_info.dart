@@ -1,4 +1,4 @@
-class DirectionDetailsInfo{
+class DirectionDetailsInfo {
   int? distance_value;
   int? duration_value;
   String? distance_text;
@@ -12,7 +12,4 @@ class DirectionDetailsInfo{
     this.duration_text,
     this.e_points,
   });
-
-
-
 }

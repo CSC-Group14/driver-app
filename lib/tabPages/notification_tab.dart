@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:logitrust_drivers/mainScreens/new_trip_screen.dart';
 import 'package:logitrust_drivers/models/riderequest.dart';
+import 'package:logitrust_drivers/widgets/push_notification_dialog.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -36,46 +37,20 @@ class _NotificationPageState extends State<NotificationPage> {
               snapshot.data!.snapshot.value == null) {
             return const Center(child: Text('No ride requests available.'));
           } else {
-            // Parse ride requests
             final data = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
-
-
-            // Ensure data is in the expected format and filter out empty requests
             final rideRequests = data.entries
                 .map((entry) {
                   final request = entry.value;
-
-                  // Check if the request is a Map
                   if (request is Map<dynamic, dynamic>) {
-                    // Create a RideRequest instance and validate required fields
-                    final rideRequest = RideRequest(
-                      id: entry.key.toString(),
-                      destinationAddress: request['destinationAddress'] ?? '',
-                      sourceAddress: request['sourceAddress'] ?? '',
-                      time: request['time'] ?? '',
-                      userName: request['userName'] ?? '',
-                      userPhone: request['userPhone'] ?? '',
-                      status: request['status'] ?? '',
-                    );
-
-                    // Return the rideRequest if it has all required fields
-                    if (rideRequest.destinationAddress.isNotEmpty &&
-                        rideRequest.sourceAddress.isNotEmpty &&
-                        rideRequest.time.isNotEmpty &&
-                        rideRequest.userName.isNotEmpty &&
-                        rideRequest.userPhone.isNotEmpty) {
-                      return rideRequest;
-                    }
+                    final rideRequest = RideRequest.fromMap(request);
+                    return rideRequest;
                   }
-
-                  // Handle unexpected data format or empty request
-                  print('Invalid or empty ride request: $entry');
-                  return null; // or return a default value
+                  return null;
                 })
                 .whereType<RideRequest>()
                 .toList();
-          
 
+            rideRequests.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
             return ListView.builder(
               itemCount: rideRequests.length,
@@ -92,6 +67,11 @@ class _NotificationPageState extends State<NotificationPage> {
                       'Time: ${request.time}\n'
                       'Status: ${request.status}',
                     ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.check_circle, color: Colors.green),
+                      onPressed: () => _acceptRide(request),
+                    ),
+                    onLongPress: () => _showRideRequestDialog(request.id),
                   ),
                 );
               },
@@ -106,6 +86,7 @@ class _NotificationPageState extends State<NotificationPage> {
     try {
       await _rideRequestsRef.child(request.id).update({
         'status': 'Accepted',
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
       });
 
       Navigator.push(
@@ -118,7 +99,10 @@ class _NotificationPageState extends State<NotificationPage> {
       );
     } catch (e) {
       print('Error updating ride status: $e');
-      // Optionally show an error message to the user
     }
+  }
+
+  void _showRideRequestDialog(String rideRequestId) {
+    showRideRequestDialog(context, rideRequestId);
   }
 }

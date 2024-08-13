@@ -102,20 +102,20 @@ class AssistantMethods {
       DirectionDetailsInfo directionDetailsInfo, String? vehicleType) {
     double baseFare, FareAmountPerMinute, FareAmountPerKilometer;
     if (vehicleType == "large") {
-      baseFare = 30;
-      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 3;
+      baseFare = 300000;
+      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 300;
       FareAmountPerKilometer =
-          (directionDetailsInfo.distance_value! / 1000) * 20;
+          (directionDetailsInfo.distance_value! / 1000) * 2000;
     } else if (vehicleType == "medium") {
-      baseFare = 50;
-      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 4;
+      baseFare = 500000;
+      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 400;
       FareAmountPerKilometer =
-          (directionDetailsInfo.distance_value! / 1000) * 25;
+          (directionDetailsInfo.distance_value! / 1000) * 2500;
     } else {
-      baseFare = 20;
-      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 1;
+      baseFare = 100000;
+      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 100;
       FareAmountPerKilometer =
-          (directionDetailsInfo.distance_value! / 1000) * 10;
+          (directionDetailsInfo.distance_value! / 1000) * 1000;
     }
 
     //In taka
@@ -173,7 +173,7 @@ class AssistantMethods {
         var eachTripHistoryInformation =
             TripHistoryModel.fromSnapshot(snapData.snapshot);
 
-        if ((snapData.snapshot.value as Map)["status"] == "Ended") {
+        if ((snapData.snapshot.value as Map)["driverStatus"] == "Ended") {
           // Add each TripHistoryModel to a  historyInformationList in AppInfo class
           Provider.of<AppInfo>(context, listen: false)
               .updateTotalHistoryInformation(eachTripHistoryInformation);
@@ -191,7 +191,7 @@ class AssistantMethods {
         .then((snapData) async {
       var lastTripHistoryInformation =
           TripHistoryModel.fromSnapshot(snapData.snapshot);
-      if ((snapData.snapshot.value as Map)["status"] == "Ended") {
+      if ((snapData.snapshot.value as Map)["driverStatus"] == "Ended") {
         // Add each TripHistoryModel to a  historyInformationList in AppInfo class
 
         LatLng lastTripSourceLatLng = LatLng(

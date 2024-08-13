@@ -51,75 +51,73 @@ class _NewTripScreenState extends State<NewTripScreen> {
   String durationFromSourceToDestination = "";
   bool isRequestDirectionDetails = false;
 
-  @override
+    @override
   void initState() {
     super.initState();
     saveAssignedDriverDetailsToRideRequest();
-    fetchSourceAndDestination();
-    saveAssignedDriverDetailsToRideRequest(); // Fetch source and destination locations
+    fetchSourceAndDestination(); 
+    saveAssignedDriverDetailsToRideRequest();// Fetch source and destination locations
   }
+
 
   Future<void> fetchSourceAndDestination() async {
-    if (widget.rideRequest == null) return;
+  if (widget.rideRequest == null) return;
 
-    DatabaseReference rideRequestRef = FirebaseDatabase.instance
-        .ref()
-        .child("AllRideRequests")
-        .child(widget.rideRequest!.id);
+  DatabaseReference rideRequestRef = FirebaseDatabase.instance
+      .ref()
+      .child("AllRideRequests")
+      .child(widget.rideRequest!.id);
 
-    // Fetch source and destination as DatabaseEvent
-    DatabaseEvent sourceEvent = await rideRequestRef.child("source").once();
-    DatabaseEvent destinationEvent =
-        await rideRequestRef.child("destination").once();
+  // Fetch source and destination as DatabaseEvent
+  DatabaseEvent sourceEvent = await rideRequestRef.child("source").once();
+  DatabaseEvent destinationEvent = await rideRequestRef.child("destination").once();
 
-    // Access DataSnapshot from DatabaseEvent
-    DataSnapshot sourceSnapshot = sourceEvent.snapshot;
-    DataSnapshot destinationSnapshot = destinationEvent.snapshot;
+  // Access DataSnapshot from DatabaseEvent
+  DataSnapshot sourceSnapshot = sourceEvent.snapshot;
+  DataSnapshot destinationSnapshot = destinationEvent.snapshot;
 
-    if (sourceSnapshot.exists && destinationSnapshot.exists) {
-      var sourceData = sourceSnapshot.value as Map?;
-      var destinationData = destinationSnapshot.value as Map?;
+  if (sourceSnapshot.exists && destinationSnapshot.exists) {
+    var sourceData = sourceSnapshot.value as Map?;
+    var destinationData = destinationSnapshot.value as Map?;
 
-      if (sourceData != null && destinationData != null) {
-        double sourceLat = double.parse(sourceData['latitude'].toString());
-        double sourceLng = double.parse(sourceData['longitude'].toString());
-        double destinationLat =
-            double.parse(destinationData['latitude'].toString());
-        double destinationLng =
-            double.parse(destinationData['longitude'].toString());
+    if (sourceData != null && destinationData != null) {
+      double sourceLat = double.parse(sourceData['latitude'].toString());
+      double sourceLng = double.parse(sourceData['longitude'].toString());
+      double destinationLat = double.parse(destinationData['latitude'].toString());
+      double destinationLng = double.parse(destinationData['longitude'].toString());
 
-        LatLng sourceLatLng = LatLng(sourceLat, sourceLng);
-        LatLng destinationLatLng = LatLng(destinationLat, destinationLng);
+      LatLng sourceLatLng = LatLng(sourceLat, sourceLng);
+      LatLng destinationLatLng = LatLng(destinationLat, destinationLng);
 
-        setState(() {
-          // Add markers for source and destination
-          setOfMarkers.add(
-            Marker(
-              markerId: const MarkerId("sourceID"),
-              position: sourceLatLng,
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueGreen),
-              infoWindow: const InfoWindow(title: "Source"),
-            ),
-          );
-          setOfMarkers.add(
-            Marker(
-              markerId: const MarkerId("destinationID"),
-              position: destinationLatLng,
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueRed),
-              infoWindow: const InfoWindow(title: "Destination"),
-            ),
-          );
-
-          // Draw the polyline
-          drawPolylineFromSourceToDestination(sourceLatLng, destinationLatLng);
-        });
-      }
-    } else {
-      Fluttertoast.showToast(msg: "Source or destination data not found.");
+      setState(() {
+        // Add markers for source and destination
+        setOfMarkers.add(
+          Marker(
+            markerId: const MarkerId("sourceID"),
+            position: sourceLatLng,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+            infoWindow: const InfoWindow(title: "Source"),
+          ),
+        );
+        setOfMarkers.add(
+          Marker(
+            markerId: const MarkerId("destinationID"),
+            position: destinationLatLng,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            infoWindow: const InfoWindow(title: "Destination"),
+          ),
+        );
+        
+        
+        // Draw the polyline
+        drawPolylineFromSourceToDestination(sourceLatLng, destinationLatLng);
+      });
     }
+  } else {
+    Fluttertoast.showToast(msg: "Source or destination data not found.");
   }
+}
+
 
   Future<void> drawPolylineFromSourceToDestination(
       LatLng source, LatLng destination) async {
@@ -230,6 +228,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     });
   }
 
+
   Future<void> endTrip() async {
     showDialog(
       context: context,
@@ -251,8 +250,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
     if (tripDirectionDetailsInfo == null) return;
 
     Fluttertoast.showToast(
-        msg:
-            "KM:${tripDirectionDetailsInfo.duration_text!} Time:${tripDirectionDetailsInfo.distance_text!}");
+        msg: "KM:${tripDirectionDetailsInfo.duration_text!} Time:${tripDirectionDetailsInfo.distance_text!}");
 
     double? fareAmount =
         AssistantMethods.calculateFareAmountFromSourceToDestination(
@@ -262,7 +260,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
         .ref()
         .child("AllRideRequests")
         .child(widget.rideRequest!.id)
-        .child("status")
+        .child("driverStatus")
         .set("Ended");
 
     FirebaseDatabase.instance
@@ -315,18 +313,21 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
   Future<String?> getPhoneNumberFromFirebase() async {
     DatabaseReference reference = FirebaseDatabase.instance
-        .ref()
-        .child('Users')
-        .child(currentFirebaseUser!.uid)
-        .child("phone");
-
+    .ref()
+    .child('Users')
+    .child(currentFirebaseUser!.uid)
+    .child("phone");
+    
     DataSnapshot snapshot = (await reference.once()) as DataSnapshot;
-
+    
     if (snapshot.exists) {
       return snapshot.value.toString();
     }
     return null;
   }
+
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -350,6 +351,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
 
               setState(() {
                 mapPadding = 320;
+                
               });
 
               if (driverCurrentPosition != null && widget.rideRequest != null) {
@@ -366,7 +368,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                   // Check if source is a LatLng object or Map
                   LatLng sourceLatLng;
                   sourceLatLng = source;
-
+                
                   drawPolylineFromSourceToDestination(
                       driverCurrentLatLng, sourceLatLng);
                 } else {
@@ -394,8 +396,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                 ],
               ),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
                 child: Column(
                   children: [
                     Text(
@@ -432,6 +433,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                             color: Colors.black,
                           ),
                         ),
+                        
                       ],
                     ),
                     const SizedBox(
@@ -492,18 +494,15 @@ class _NewTripScreenState extends State<NewTripScreen> {
                             if (widget.rideRequest?.userPhone != null) {
                               _makePhoneCall(widget.rideRequest!.userPhone!);
                             } else {
-                              Fluttertoast.showToast(
-                                  msg: "Phone number not available.");
+                              Fluttertoast.showToast(msg: "Phone number not available.");
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color.fromARGB(255, 235, 135, 4),
-
-                            // Set button color
+                            backgroundColor: Color.fromARGB(255, 249, 247, 245), // Set button color
                             padding: const EdgeInsets.all(5.0),
-                            textStyle: const TextStyle(color: Colors.black),
+                            textStyle: const TextStyle(color: Colors.white),
                           ),
-                          child: const Text('Call Customer'),
+                          child: const Text('Call'),
                         ),
                       ],
                     ),
@@ -531,7 +530,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                               .ref()
                               .child("AllRideRequests")
                               .child(widget.rideRequest!.id)
-                              .child("status")
+                              .child("driverStatus")
                               .set(rideRequestStatus);
 
                           showDialog(
@@ -557,7 +556,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
                               .ref()
                               .child("AllRideRequests")
                               .child(widget.rideRequest!.id)
-                              .child("status")
+                              .child("driverStatus")
                               .set(rideRequestStatus);
                         } else if (rideRequestStatus == "On Trip") {
                           endTrip();
@@ -609,7 +608,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
       "longitude": driverCurrentPosition?.longitude,
     };
 
-    reference.child("status").set("Accepted");
+    reference.child("driverStatus").set("Accepted");
     reference.child("driverId").set(driverData.id);
     reference.child("driverName").set(driverData.name);
     reference.child("driverPhone").set(driverData.phone);
@@ -641,6 +640,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
   }
 
   updateDriversLocationAtRealTime() {
+    
     streamSubscriptionPosition =
         Geolocator.getPositionStream().listen((Position position) {
       driverCurrentPosition = position;
@@ -688,6 +688,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
   }
 
   updateDurationAtRealTime() async {
+    
     if (!isRequestDirectionDetails) {
       isRequestDirectionDetails = true;
 
@@ -714,7 +715,6 @@ class _NewTripScreenState extends State<NewTripScreen> {
       }
     }
   }
-
   void _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(
       scheme: 'tel',
@@ -726,4 +726,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
       Fluttertoast.showToast(msg: "Could not place the call.");
     }
   }
+
 }
+
+

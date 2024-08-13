@@ -39,7 +39,7 @@ class _RideRequestDialogState extends State<RideRequestDialog> {
         });
       } else {
         setState(() {
-          _rideRequest = null; // or show an appropriate message
+          _rideRequest = null;
         });
       }
     } catch (error) {
@@ -73,10 +73,10 @@ class _RideRequestDialogState extends State<RideRequestDialog> {
   Future<void> _declineRideRequest() async {
     try {
       await _rideRequestRef.update({
-        'status': 'Declined',
+        'status': 'Pending', // Keep as "Pending" if declined
       });
 
-      Navigator.of(context).pop(); // Close the dialog
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ride request declined.')),
       );
@@ -95,7 +95,6 @@ class _RideRequestDialogState extends State<RideRequestDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Pickup Details
                   Row(
                     children: [
                       Image.asset(
@@ -105,21 +104,18 @@ class _RideRequestDialogState extends State<RideRequestDialog> {
                       ),
                       const SizedBox(width: 22),
                       Expanded(
-                        child: Container(
-                          child: Text(
-                            "Source Address: ${_rideRequest!.sourceAddress}",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                        child: Text(
+                          "Source Address: ${_rideRequest!.sourceAddress}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 25),
-                  // Destination Details
                   Row(
                     children: [
                       Image.asset(
@@ -129,14 +125,12 @@ class _RideRequestDialogState extends State<RideRequestDialog> {
                       ),
                       const SizedBox(width: 20),
                       Expanded(
-                        child: Container(
-                          child: Text(
-                            "Destination Address: ${_rideRequest!.destinationAddress}",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                        child: Text(
+                          "Destination Address: ${_rideRequest!.destinationAddress}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -214,7 +208,7 @@ void showRideRequestDialog(BuildContext context, String rideRequestId) async {
         return RideRequestDialog(rideRequestId: rideRequestId);
       },
     ).then((_) {
-      _dialogShowing = false; // Reset the flag when the dialog is closed
+      _dialogShowing = false;
     });
   } else {
     ScaffoldMessenger.of(context).showSnackBar(

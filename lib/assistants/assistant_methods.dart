@@ -100,29 +100,32 @@ class AssistantMethods {
 
   static double calculateFareAmountFromSourceToDestination(
       DirectionDetailsInfo directionDetailsInfo, String? vehicleType) {
-    double baseFare, FareAmountPerMinute, FareAmountPerKilometer;
+    double baseFare, fareAmountPerMinute, fareAmountPerKilometer;
+
     if (vehicleType == "large") {
-      baseFare = 30;
-      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 3;
-      FareAmountPerKilometer =
-          (directionDetailsInfo.distance_value! / 1000) * 20;
+      baseFare = 3000;
+      fareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 300;
+      fareAmountPerKilometer =
+          (directionDetailsInfo.distance_value! / 1000) * 2000;
     } else if (vehicleType == "medium") {
-      baseFare = 50;
-      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 4;
-      FareAmountPerKilometer =
-          (directionDetailsInfo.distance_value! / 1000) * 25;
+      baseFare = 5000;
+      fareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 400;
+      fareAmountPerKilometer =
+          (directionDetailsInfo.distance_value! / 1000) * 2500;
     } else {
-      baseFare = 20;
-      FareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 1;
-      FareAmountPerKilometer =
-          (directionDetailsInfo.distance_value! / 1000) * 10;
+      baseFare = 2000;
+      fareAmountPerMinute = (directionDetailsInfo.duration_value! / 60) * 100;
+      fareAmountPerKilometer =
+          (directionDetailsInfo.distance_value! / 1000) * 1000;
     }
 
-    //In taka
     double totalFareAmount =
-        baseFare + FareAmountPerMinute + FareAmountPerKilometer;
+        baseFare + fareAmountPerMinute + fareAmountPerKilometer;
 
-    return double.parse(totalFareAmount.toStringAsFixed(1));
+    // Round to the nearest 1000 UGX
+    totalFareAmount = (totalFareAmount / 1000).round() * 1000;
+
+    return totalFareAmount;
   }
 
   // For Trip history
